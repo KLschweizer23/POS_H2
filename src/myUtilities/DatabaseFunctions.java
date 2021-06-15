@@ -63,7 +63,7 @@ public class DatabaseFunctions
             {
                 executeQuery(insert);
             }catch(SQLException sqlE){mh.error("There was an error inserting into the Table '" + tableName + "'! Error Message: " + sqlE);}
-        }else mh.error("Column size and Data size doesn't match. There should only be a difference of one (1). column: " + column.length + "; data: " + data.length);
+        }else mh.error("Column size and Data size doesn't match. There should only be a difference of one (1) where column is greater than data. Column: " + column.length + "; Data: " + data.length);
     }
     
     /**
@@ -221,7 +221,7 @@ public class DatabaseFunctions
      */
     public String whereEquals (String column, String data)
     {
-        return " WHERE " + column + " = '" + data + "'";
+        return " WHERE " + column + " = '" + data + "' ";
     }
     
     /**
@@ -232,7 +232,7 @@ public class DatabaseFunctions
      */
     public String whereNotEquals (String column, String data)
     {
-        return " WHERE " + column + " != '" + data + "'";
+        return " WHERE " + column + " != '" + data + "' ";
     }
     
     /**
@@ -243,7 +243,7 @@ public class DatabaseFunctions
      */
     public String andEquals (String column, String data)
     {
-        return " AND " + column + " = '" + data + "'";
+        return "AND " + column + " = '" + data + "'";
     }    
     
     /**
@@ -254,6 +254,46 @@ public class DatabaseFunctions
      */
     public String andNotEquals (String column, String data)
     {
-        return " AND " + column + " != '" + data + "'";
+        return "AND " + column + " != '" + data + "'";
+    }
+  
+    /**
+     * 
+     * @param keys Columns you want to select in a String array format.
+     * @return Returns a string for execution.
+     */
+    public String select(String[] keys)
+    {
+        return "SELECT " + arrayToString(keys, false) + " ";
+    } 
+    
+    /**
+     * 
+     * @return Returns a string for execution.
+     */
+    public String selectAll()
+    {
+        return "SELECT * ";
+    } 
+    
+    /**
+     * 
+     * @param selectString
+     * @param asName
+     * @return 
+     */
+    public String selectSingleAs(String selectString, String asName)
+    {
+        return "SELECT " + selectString + " as " + asName + " ";
+    }
+    
+    /**
+     * 
+     * @param tableName Table to select.
+     * @return Returns a string for execution.
+     */
+    public String from(String tableName)
+    {
+        return "FROM " + tableName;
     }
 }
