@@ -2,7 +2,7 @@ package myUtilities;
 
 import javax.swing.JOptionPane;
 
-public class DisplayMessage
+public class MessageHandler
 {
     public void message(String message)
     {
