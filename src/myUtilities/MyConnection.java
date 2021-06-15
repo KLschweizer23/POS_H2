@@ -1,4 +1,4 @@
-package pos_h2_database.utility;
+package myUtilities;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

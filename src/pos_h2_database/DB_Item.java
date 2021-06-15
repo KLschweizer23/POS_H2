@@ -1,6 +1,6 @@
 package pos_h2_database;
 
-import pos_h2_database.utility.DatabaseFunctions;
+import myUtilities.DatabaseFunctions;
 
 
 

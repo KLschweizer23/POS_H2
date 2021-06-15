@@ -1,5 +1,5 @@
 
-package pos_h2_database.utility;
+package myUtilities;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -35,8 +35,9 @@ public class DatabaseFunctions
      */
     public void createTable(String tableName, String colAndAttr)
     {
+        DisplayMessage dm = new DisplayMessage();
         String create = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + colAndAttr + ")";
-        
+        //executeQuery(create);
     }
     
     /**
@@ -52,27 +53,27 @@ public class DatabaseFunctions
         con.close();
     }    
     /**
-     * executeReturnQuery
+     * executeReturnQuery concept is to return a list of data of every columns received.
      * 
      * @param query Query to execute.
-     * @param keys Keys should be equal to Column Names 
+     * @param column column should be same to Column Names 
      * 
-     * @return Returns HashMap with your keys and values as ArrrayList
+     * @return Returns HashMap with your keys(column) and values as ArrrayList
      * 
      * @throws SQLException Throws the Origin of Exception.
      */
-    public HashMap executeReturnQuery(String query, String[] keys) throws SQLException
+    public HashMap executeReturnQuery(String query, String[] column) throws SQLException
     {
         Connection con = getConnection();
         PreparedStatement execQuery = con.prepareStatement(query);
         ResultSet result = execQuery.executeQuery();
         
-        ArrayList[] array = returnKeyLists(result, keys);
+        ArrayList[] array = this.returnKeyLists(result, column);
         HashMap map = new HashMap();
         
-        for(int i = 0; i < keys.length; i++)
+        for(int i = 0; i < column.length; i++)
         {
-            map.put(keys[i], array[0]);
+            map.put(column[i], array[i]);
         }
         
         con.close();
@@ -82,13 +83,21 @@ public class DatabaseFunctions
     
     private ArrayList[] returnKeyLists(ResultSet result, String[] keys) throws SQLException
     {
-        ArrayList[] array = new ArrayList[keys.length];
+        ArrayList[] array = new ArrayList[keys.length];//Arrayed ArrayList with a length of how many keys was passed
         
-        while(result.next())
+        while(result.next()) // moves cursor through rows
         {
             for(int i = 0; i < keys.length; i++)
             {
                 array[0].add(result.getString(keys[i]));
+                /*
+                 * 1st array will get the 1st key column on row i
+                 * 2nd array will get the 2nd key column on row i
+                 * ...
+                 * nth array will get the nth key column on row i
+                 *
+                 * then repeats the process at the next row.
+                 */
             }
         }
         return array;
