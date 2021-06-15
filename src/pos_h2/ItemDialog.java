@@ -1,12 +1,18 @@
 package pos_h2;
+
+import pos_h2_database.DB_Item;
+
 public class ItemDialog extends javax.swing.JDialog {
 
     
     public ItemDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
     }
 
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
