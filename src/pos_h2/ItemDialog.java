@@ -1,12 +1,14 @@
 package pos_h2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
 import pos_h2_database.*;
 
 public class ItemDialog extends javax.swing.JDialog {
 
-    DefaultTableModel dtm;
+    private ArrayList<String> idList;
+    private DefaultTableModel dtm;
     
     private void createColumns()
     {
@@ -29,14 +31,40 @@ public class ItemDialog extends javax.swing.JDialog {
     private void processTable()
     {
         DB_Item itemDb = new DB_Item();
+        
+        clearTable();
+        
+        idList = itemDb.getIdList();
+        
         HashMap<String, Item> item = itemDb.processData();
         
         for(int i = 0; i < item.size(); i++)
         {
-            
+            String id = idList.get(i);
+            String[] rowData =
+            {
+                item.get(id).getId(),
+                item.get(id).getName(),
+                item.get(id).getArticle(),
+                item.get(id).getBrand(),
+                item.get(id).getQuantity(),
+                item.get(id).getPrice()
+            };
+            dtm.addRow(rowData);
+        }
+        if(itemTable.getRowCount() >= 1)
+        {
+            itemTable.setRowSelectionInterval(0, 0);
+        }
+        itemTable.setRowHeight(30);
+    }
+    private void clearTable()
+    {
+        for(int i = 0; i < dtm.getRowCount(); i ++)
+        {
+            dtm.removeRow(i);
         }
     }
-    
     public ItemDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

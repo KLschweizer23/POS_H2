@@ -45,7 +45,7 @@ public class DatabaseFunctions
         try
         {
             executeQuery(create);
-        }catch(SQLException sqlE){mh.error("There was an error creating The Table! Error Message: " + sqlE);}
+        }catch(SQLException sqlE){mh.error("There was an error creating The Table! Query: " + create);}
     }
     
     /**
@@ -367,7 +367,7 @@ public class DatabaseFunctions
         
         String makeNull = isNull ? "NULL" : " NOT NULL ";
         String makeSigned = isSigned ? "SIGNED" : "UNSIGNED";
-        String makePrimary = isPrimary ? "PRIMARY" : "";
+        String makePrimary = isPrimary ? "PRIMARY KEY" : "";
         String increment = autoIncrement ? "AUTO_INCREMENT" : "" ;
         
         String colAndAttr = column + " INTEGER " + makeSigned + " " + makeNull + " " + increment + " " + makePrimary;
@@ -389,7 +389,7 @@ public class DatabaseFunctions
         
         String makeNull = isNull ? "NULL" : " NOT NULL ";
         String makeSigned = isSigned ? "SIGNED" : "UNSIGNED";
-        String makePrimary = isPrimary ? "PRIMARY" : "";
+        String makePrimary = isPrimary ? "PRIMARY KEY" : "";
         String increment = autoIncrement ? "AUTO_INCREMENT" : "" ;
         
         String colAndAttr = column + " INTEGER " + makeSigned + " " + makeNull + " " + increment + " " + makePrimary;

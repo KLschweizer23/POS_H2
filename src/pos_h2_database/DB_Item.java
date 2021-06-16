@@ -10,14 +10,15 @@ public class DB_Item {
     private final String table = "table_item";
     
     private final String ID = "ID";
-    private final String NAME = "NAME";
+    private final String NAME = "ITEM_NAME";
     private final String BRAND = "BRAND";
     private final String ARTICLE = "ARTICLE";
     private final String QUANTITY = "QUANTITY";
     private final String PRICE = "PRICE";
     private final String SOLD = "SOLD";
     
-    HashMap<String, Item> item = new HashMap<>();
+    private HashMap<String, Item> item = new HashMap<>();
+    private ArrayList<String> idList = new ArrayList<>();
     
     public DB_Item()
     {
@@ -27,28 +28,33 @@ public class DB_Item {
     
     public HashMap<String, Item> processData()
     {
+        item.clear();
+        idList.clear();
+        
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
         HashMap<String, ArrayList> map = dbf.selectAllData(table, keys);
-        
-        for(int i = 0; i < map.get("ID").size(); i++)
+        for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
         {
             Item itemObject = new Item();
-            itemObject.setId(map.get("ID").get(i).toString());
-            itemObject.setName(map.get("NAME").get(i).toString());
-            itemObject.setBrand(map.get("BRAND").get(i).toString());
-            itemObject.setArticle(map.get("ARTICLE").get(i).toString());
-            itemObject.setQuantity(map.get("QUANTITY").get(i).toString());
-            itemObject.setPrice(map.get("PRICE").get(i).toString());
-            itemObject.setSold(map.get("SOLD").get(i).toString());
+            String id = map.get(ID).get(i).toString();
             
-            item.put(map.get("ID").get(i).toString(), itemObject);
+            itemObject.setId(id);
+            itemObject.setName(map.get(NAME).get(i).toString());
+            itemObject.setBrand(map.get(BRAND).get(i).toString());
+            itemObject.setArticle(map.get(ARTICLE).get(i).toString());
+            itemObject.setQuantity(map.get(QUANTITY).get(i).toString());
+            itemObject.setPrice(map.get(PRICE).get(i).toString());
+            itemObject.setSold(map.get(SOLD).get(i).toString());
+            
+            item.put(id, itemObject);
+            idList.add(id);
         }
         return item;
     }
     
-    private String[] columnToKeys(boolean withAttr)
+    public String[] columnToKeys(boolean withAttr)
     {
         DatabaseFunctions dbf = new DatabaseFunctions();
         
@@ -64,5 +70,9 @@ public class DB_Item {
             dbf.makeIntAttr(SOLD, false, false, false, false)
         };
         return withAttr ? keysWithAttr : keys;
+    }
+
+    public ArrayList<String> getIdList() {
+        return idList;
     }
 }
