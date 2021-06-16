@@ -1,18 +1,49 @@
 package pos_h2;
 
-import pos_h2_database.DB_Item;
+import java.util.HashMap;
+import javax.swing.table.DefaultTableModel;
+import pos_h2_database.*;
 
 public class ItemDialog extends javax.swing.JDialog {
 
+    DefaultTableModel dtm;
+    
+    private void createColumns()
+    {
+        dtm = new DefaultTableModel(0,0)
+        {
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        };
+        itemTable.setModel(dtm);
+        dtm.addColumn("ID");
+        dtm.addColumn("Item");
+        dtm.addColumn("Article");
+        dtm.addColumn("Brand");
+        dtm.addColumn("Quantity");
+        dtm.addColumn("Price");
+    }
+    
+    private void processTable()
+    {
+        DB_Item itemDb = new DB_Item();
+        HashMap<String, Item> item = itemDb.processData();
+        
+        for(int i = 0; i < item.size(); i++)
+        {
+            
+        }
+    }
     
     public ItemDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         
+        createColumns();
+        processTable();
     }
-
-    
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -22,17 +53,40 @@ public class ItemDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        itemTable = new javax.swing.JTable();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        itemTable.setFillsViewportHeight(true);
+        itemTable.setRequestFocusEnabled(false);
+        itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(itemTable);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 929, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 49, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 371, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 459, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -40,5 +94,8 @@ public class ItemDialog extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable itemTable;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

@@ -34,10 +34,10 @@ public class DatabaseFunctions
      * @param tableName Name for table to create eg. <i>SampleTable</i>.
      * @param columnAndAttr Columns with their Attributes in an array String format.<br>
      * <i>e.g.</i><br>
-     * array[0] = "ID INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY"
-     * array[1] = "NAME VARCHAR(150) NOT NULL"
-     * ...
-     * array[nth] = "..."
+     * array[0] = "ID INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY"<br>
+     * array[1] = "NAME VARCHAR(150) NOT NULL"<br>
+     * ...<br>
+     * array[nth] = "..."<br>
      */
     public void createTable(String tableName, String[] columnAndAttr)
     {
@@ -103,6 +103,23 @@ public class DatabaseFunctions
     
     /**
      * 
+     * @param table Table to retrieve Data.
+     * @param column Columns of Table to retrieve Data.
+     * @return Returns a HashMap with keys as your column and values as ArrayList of data in columns.
+     */
+    public HashMap selectAllData(String table, String[] column)
+    {
+        HashMap<String, ArrayList> map = new HashMap();
+        String query = "SELECT * FROM " + table;
+        try
+        {
+            map = executeReturnQuery(query, column);
+        }catch(SQLException sqlE){mh.error("There was an error Retrieving Data from Database -> '" + query + "'! Error Message: " + sqlE);}
+        return map;
+    }
+    
+    /**
+     * 
      * @param query Query to execute.
      * @throws SQLException Throws the Origin of Exception.
      */
@@ -131,7 +148,7 @@ public class DatabaseFunctions
         ResultSet result = execQuery.executeQuery();
         
         ArrayList[] array = this.returnKeyLists(result, column);
-        HashMap map = new HashMap();
+        HashMap<String, ArrayList> map = new HashMap();
         
         for(int i = 0; i < column.length; i++)
         {
@@ -213,6 +230,27 @@ public class DatabaseFunctions
     
     
     //-----------------------SIMPLE OOP FUNCTIONS FOR DATBASE--------------------\\
+    
+    /**
+     * 
+     * @param data Data for the LIKE clause
+     * @return Returns a LIKE clause
+     */
+    public String likeEquals (String data)
+    {
+        return " LIKE %" + data + "%";
+    }
+    
+    /**
+     * 
+     * @param column Column for WHERE clause
+     * @return Returns a WHERE clause
+     */
+    public String where(String column)
+    {
+        return " WHERE " + column;
+    }
+    
     /**
      * 
      * @param column Column from table for the condition.
@@ -295,5 +333,67 @@ public class DatabaseFunctions
     public String from(String tableName)
     {
         return "FROM " + tableName;
+    }
+    
+    /**
+     * 
+     * @param column Name of Column.
+     * @param varSize Size of Varchar with a range of 0-255.
+     * @param isNull If column data can be Null or Not Null<br>
+     * <b>TRUE</b> - Then column can have a Null Value;
+     * <b>FALSE</b> - Then column cannot have a Null Value;
+     * @return 
+     */
+    public String makeVarcharAttr(String column, int varSize, boolean isNull)
+    {
+        String makeNull = isNull ? "NULL" : " NOT NULL ";
+        
+        String colAndAttr = column + " VARCHAR(" + varSize + ") " + makeNull;
+        
+        return colAndAttr;
+    }
+    
+    /**
+     * 
+     * @param column Name of Column.
+     * @param isSigned Is Column Signed.
+     * @param isNull Can column contain null values.
+     * @param autoIncrement If this column increments automatically.
+     * @param isPrimary Is Column a primary key.
+     * @return 
+     */
+    public String makeIntAttr(String column, boolean isSigned, boolean isNull, boolean autoIncrement, boolean isPrimary)
+    {
+        
+        String makeNull = isNull ? "NULL" : " NOT NULL ";
+        String makeSigned = isSigned ? "SIGNED" : "UNSIGNED";
+        String makePrimary = isPrimary ? "PRIMARY" : "";
+        String increment = autoIncrement ? "AUTO_INCREMENT" : "" ;
+        
+        String colAndAttr = column + " INTEGER " + makeSigned + " " + makeNull + " " + increment + " " + makePrimary;
+                
+        return colAndAttr;
+    }    
+    
+    /**
+     * 
+     * @param column Name of Column.
+     * @param isSigned Is Column Signed.
+     * @param isNull Can column contain null values.
+     * @param autoIncrement If this column increments automatically.
+     * @param isPrimary Is Column a primary key.
+     * @return 
+     */
+    public String makeDoubleAttr(String column, boolean isSigned, boolean isNull, boolean autoIncrement, boolean isPrimary)
+    {
+        
+        String makeNull = isNull ? "NULL" : " NOT NULL ";
+        String makeSigned = isSigned ? "SIGNED" : "UNSIGNED";
+        String makePrimary = isPrimary ? "PRIMARY" : "";
+        String increment = autoIncrement ? "AUTO_INCREMENT" : "" ;
+        
+        String colAndAttr = column + " INTEGER " + makeSigned + " " + makeNull + " " + increment + " " + makePrimary;
+                
+        return colAndAttr;
     }
 }
