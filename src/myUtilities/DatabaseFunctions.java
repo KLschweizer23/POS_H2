@@ -41,11 +41,14 @@ public class DatabaseFunctions
      */
     public void createTable(String tableName, String[] columnAndAttr)
     {
-        String create = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + arrayToString(columnAndAttr, false) + ")";
+        String create = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + arrayToString(columnAndAttr, false, false, false) + ")";
         try
         {
             executeQuery(create);
-        }catch(SQLException sqlE){mh.error("There was an error creating The Table! Query: " + create);}
+        }catch(SQLException sqlE){mh.error("<html>There was an error creating The Table!<br><b>Error:</b><br>"
+                + sqlE.toString().substring(0, sqlE.toString().length() / 2) + "<br>"
+                + sqlE.toString().substring(sqlE.toString().length()/ 2) + "<br>"
+                + "</html>");}
     }
     
     /**
@@ -58,12 +61,12 @@ public class DatabaseFunctions
     {
         if(column.length == data.length + 1)
         {
-            String insert = "INSERT INTO " + tableName + "(" + arrayToString(column, true) + ") VALUES (" + arrayToString(data, false) + ");";
+            String insert = "INSERT INTO " + tableName + "(" + arrayToString(column, true, false, false) + ") VALUES (" + arrayToString(data, false, true, true) + ");";
             try
             {
                 executeQuery(insert);
             }catch(SQLException sqlE){mh.error("There was an error inserting into the Table '" + tableName + "'! Error Message: " + sqlE);}
-        }else mh.error("Column size and Data size doesn't match. There should only be a difference of one (1) where column is greater than data. Column: " + column.length + "; Data: " + data.length);
+        }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column is greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");
     }
     
     /**
@@ -73,17 +76,18 @@ public class DatabaseFunctions
      * @param data Data to update in table in an array String format.
      * <br><b>NOTE:</b><br>
      * Include ID at the very first item of both array and will be use as basis of the WHERE condition:<br>
-     * <u>" WHERE " + column[0] + " = " + data[0]</u>
+     * {@code " WHERE " + column[0] + " = " + data[0]}
      */
     public void updateData(String tableName, String[] column, String[] data)
     {
         if(column.length == data.length)
         {
             String condition = whereEquals(column[0], data[0]);
-            
+            System.out.println(condition);
             String update = "UPDATE " + tableName + " SET " + arrayToStringSetter(column, data) + condition;
             try
             {
+                System.out.println(update);
                 executeQuery(update);
             }catch(SQLException sqlE){mh.error("There was an error updating the Table '" + tableName + "'! Error Message: " + sqlE);}
         }else mh.error("Column size and Data size doesn't match. There should be no difference. column: " + column.length + "; data: " + data.length);
@@ -98,19 +102,20 @@ public class DatabaseFunctions
         try
         {
             executeQuery(delete);
-        }catch(SQLException sqlE){mh.error("There was an error deleting data in the Table '" + tableName + "'! Error Message: " + sqlE);}
+        }catch(SQLException sqlE){mh.error("<html>There was an error deleting data in the Table '" + tableName + "'! <br><b>Error Message:</b><br> " + sqlE + "</html>");}
     }
     
     /**
      * 
      * @param table Table to retrieve Data.
      * @param column Columns of Table to retrieve Data.
+     * @param orderBy Orders the Data with the given column name.
      * @return Returns a HashMap with keys as your column and values as ArrayList of data in columns.
      */
-    public HashMap selectAllData(String table, String[] column)
+    public HashMap selectAllData(String table, String[] column, String orderBy)
     {
         HashMap<String, ArrayList> map = new HashMap();
-        String query = "SELECT * FROM " + table;
+        String query = "SELECT * FROM " + table + " ORDER BY " + orderBy;
         try
         {
             map = executeReturnQuery(query, column);
@@ -171,15 +176,20 @@ public class DatabaseFunctions
     {
         ArrayList[] array = new ArrayList[keys.length];//Arrayed ArrayList with a length of how many keys was passed
         
+        for(int i = 0; i < keys.length; i++)
+        {
+            array[i] = new ArrayList<String>();
+        }
+        
         while(result.next()) // moves cursor through rows
         {
-            for (String key : keys) {
-                array[0].add(result.getString(key));
+            for (int i = 0; i < keys.length; i++) {
+                array[i].add(result.getString(keys[i]));
                 /*
                  * 1st array will get the 1st key column on row i
                  * 2nd array will get the 2nd key column on row i
                  * ...
-                 * nth array will get the nth key column on row i
+                 * nth array i will get the nth key column on row i
                  *
                  * then repeats the process at the next row.
                  */
@@ -192,17 +202,22 @@ public class DatabaseFunctions
      * 
      * @param array The String in array format to process.
      * @param removeFirstItem either removes the first item or not.<br>
-     * <i>TRUE</i> - Removes the first item in array.<br>
-     * <i>FALSE</i> - Does not remove the first item in array.
+     * {@code TRUE} - Removes the first item in array.<br>
+     * {@code FALSE} - Does not remove the first item in array.
+     * @param isData Surrounds ' if {@code array} is a data.
+     * @param isBadString Whether Data is safe for sql query or not.
+     * {@code TRUE} - Adds a escape sequence for apostrophes. <br>
+     * {@code FALSE} - Original Data.
      * @return Returns a single string of the given array.
      */
-    private String arrayToString(String[] array, boolean removeFirstItem)
+    private String arrayToString(String[] array, boolean removeFirstItem, boolean isData, boolean isBadString)
     {
         String returnVal = "";
+        String isDataChar = isData ? "'" : "";
         
         for(int i = removeFirstItem ? 1 : 0; i < array.length; i++)
         {
-            returnVal += "," + array[i];
+            returnVal += "," + isDataChar + (isBadString ? goodString(array[i]) : array[i]) + isDataChar;
         }
         
         returnVal = returnVal.substring(1);
@@ -221,13 +236,23 @@ public class DatabaseFunctions
         String[] setData = new String[column.length];
         for(int i = 0; i < column.length; i++)
         {
-            setData[i] = column[i] + " = '" + data[i] + "'";
+            setData[i] = column[i] + " = '" + goodString(data[i]) + "'";
         }
-        String settedString = arrayToString(setData, true);
+        String settedString = arrayToString(setData, true, false, false);
         
         return settedString;
     }
     
+    /**
+     * 
+     * @param data Data to process.
+     * @return Returns a String for safety SQL Execution.
+     */
+    private String goodString(String data)
+    {
+        String temp = data.replaceAll("'", "\\\\'");
+        return temp;
+    }
     
     //-----------------------SIMPLE OOP FUNCTIONS FOR DATBASE--------------------\\
     
@@ -302,7 +327,7 @@ public class DatabaseFunctions
      */
     public String select(String[] keys)
     {
-        return "SELECT " + arrayToString(keys, false) + " ";
+        return "SELECT " + arrayToString(keys, false, false, true) + " ";
     } 
     
     /**
@@ -395,5 +420,13 @@ public class DatabaseFunctions
         String colAndAttr = column + " INTEGER " + makeSigned + " " + makeNull + " " + increment + " " + makePrimary;
                 
         return colAndAttr;
+    }
+    
+    private String[] removeFirstItem(String[] array)
+    {
+        String[] newArray = new String[array.length - 1];
+        for(int i = 1; i < array.length; i++)
+            newArray[i - 1] = array[i];
+        return newArray;
     }
 }

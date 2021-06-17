@@ -17,4 +17,8 @@ public class MessageHandler
         int choice = JOptionPane.showConfirmDialog(null, message, "System Confirmation",JOptionPane.OK_CANCEL_OPTION);
         return choice;
     }
+    public void warning(String message)
+    {
+        JOptionPane.showMessageDialog(null, message, "System Warning", JOptionPane.WARNING_MESSAGE);
+    }
 }

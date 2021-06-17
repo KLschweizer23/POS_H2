@@ -1,5 +1,9 @@
 package pos_h2;
 
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
@@ -9,6 +13,8 @@ public class ItemDialog extends javax.swing.JDialog {
 
     private ArrayList<String> idList;
     private DefaultTableModel dtm;
+    
+    private int rowHeight = 30;
     
     private void createColumns()
     {
@@ -56,7 +62,7 @@ public class ItemDialog extends javax.swing.JDialog {
         {
             itemTable.setRowSelectionInterval(0, 0);
         }
-        itemTable.setRowHeight(30);
+        itemTable.setRowHeight(rowHeight);
     }
     private void clearTable()
     {
@@ -65,12 +71,66 @@ public class ItemDialog extends javax.swing.JDialog {
             dtm.removeRow(i);
         }
     }
+    private void setupTable()
+    {
+        itemTable.addMouseListener(new MouseListener() {
+            private boolean onTable = false;
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(onTable)
+                {
+                    Point p = e.getPoint();
+                    int y = p.y / rowHeight;
+                    if(y < dtm.getRowCount())
+                        //EXECUTE HERE AFTER CLICKED
+                        ;
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                onTable = true;
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                onTable = false;
+            }
+        });
+        
+        itemTable.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                int y = p.y / rowHeight;
+                if(y < dtm.getRowCount())
+                    itemTable.setRowSelectionInterval(0, y);
+            }
+        });
+    }
     public ItemDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         
         createColumns();
         processTable();
+        setupTable();
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -88,6 +148,7 @@ public class ItemDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         itemTable.setFillsViewportHeight(true);
+        itemTable.setFocusable(false);
         itemTable.setRequestFocusEnabled(false);
         itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -97,13 +158,13 @@ public class ItemDialog extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 929, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 49, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 43, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

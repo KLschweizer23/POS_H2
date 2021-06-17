@@ -34,7 +34,7 @@ public class DB_Item {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys);
+        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, NAME);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
         {
             Item itemObject = new Item();
@@ -54,6 +54,39 @@ public class DB_Item {
         return item;
     }
     
+    public void insertData(Item item)
+    {
+        DatabaseFunctions df = new DatabaseFunctions();
+        df.insertData(table, columnToKeys(false), dataToKeys(item, true));
+    }
+    
+    public void updateData(Item item)
+    {
+        DatabaseFunctions df = new DatabaseFunctions();
+        df.updateData(table, columnToKeys(false), dataToKeys(item, false));
+    }
+    
+    public String[] dataToKeys(Item item, boolean removeFirstItem)
+    {
+        String[] keysWithId ={
+            item.getId(),
+            item.getName(), 
+            item.getBrand(), 
+            item.getArticle(), 
+            item.getQuantity(), 
+            item.getPrice(),
+            item.getSold()
+        };
+        String[] keys ={
+            item.getName(), 
+            item.getBrand(), 
+            item.getArticle(), 
+            item.getQuantity(), 
+            item.getPrice(),
+            item.getSold()
+        };
+        return removeFirstItem ? keys : keysWithId;
+    }
     public String[] columnToKeys(boolean withAttr)
     {
         DatabaseFunctions dbf = new DatabaseFunctions();
@@ -71,7 +104,7 @@ public class DB_Item {
         };
         return withAttr ? keysWithAttr : keys;
     }
-
+    
     public ArrayList<String> getIdList() {
         return idList;
     }

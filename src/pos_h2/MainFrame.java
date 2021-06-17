@@ -7,6 +7,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import myUtilities.MessageHandler;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -15,6 +16,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         setup();
+        
     }
     
     public void setup()
@@ -46,27 +48,36 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuItem_add = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        menuItem_remove = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        menuItem_findPrice = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
+        menuItem_itemDb = new javax.swing.JMenuItem();
+        menuItem_salesClerkDb = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Point of Sale");
         setResizable(false);
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
 
         jPanel1.setBackground(new java.awt.Color(33, 33, 33));
         jPanel1.setPreferredSize(new java.awt.Dimension(1406, 757));
 
         jPanel3.setBackground(new java.awt.Color(202, 38, 38));
+        jPanel3.setFocusable(false);
 
         jLabel1.setBackground(new java.awt.Color(224, 224, 224));
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(224, 224, 224));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Point of Sale");
+        jLabel1.setFocusable(false);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -87,12 +98,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel4.setBackground(new java.awt.Color(50, 50, 50));
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel4.setFocusable(false);
 
         jScrollPane1.setBackground(new java.awt.Color(224, 224, 224));
         jScrollPane1.setBorder(null);
 
         jTable1.setBackground(new java.awt.Color(68, 68, 68));
         jTable1.setFillsViewportHeight(true);
+        jTable1.setFocusable(false);
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.setShowGrid(false);
         jScrollPane1.setViewportView(jTable1);
@@ -152,6 +165,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel5.setBackground(new java.awt.Color(50, 50, 50));
         jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel5.setFocusable(false);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -199,39 +213,39 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(menuItem_add);
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        jMenuItem1.setText("Remove Item");
-        jMenu1.add(jMenuItem1);
+        menuItem_remove.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_remove.setText("Remove Item");
+        jMenu1.add(menuItem_remove);
 
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        jMenuItem2.setText("Find Price");
-        jMenu2.add(jMenuItem2);
+        menuItem_findPrice.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_findPrice.setText("Find Price");
+        jMenu2.add(menuItem_findPrice);
 
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Database");
 
-        jMenuItem4.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        jMenuItem4.setText("Item Database");
-        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+        menuItem_itemDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_itemDb.setText("Item Database");
+        menuItem_itemDb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem4ActionPerformed(evt);
+                menuItem_itemDbActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem4);
+        jMenu3.add(menuItem_itemDb);
 
-        jMenuItem6.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        jMenuItem6.setText("Sales Clerk Database");
-        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+        menuItem_salesClerkDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_salesClerkDb.setText("Sales Clerk Database");
+        menuItem_salesClerkDb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem6ActionPerformed(evt);
+                menuItem_salesClerkDbActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem6);
+        jMenu3.add(menuItem_salesClerkDb);
 
         jMenuBar1.add(jMenu3);
 
@@ -263,13 +277,21 @@ public class MainFrame extends javax.swing.JFrame {
         openItemDialog();
     }//GEN-LAST:event_menuItem_addActionPerformed
 
-    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+    private void menuItem_salesClerkDbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_salesClerkDbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem6ActionPerformed
+    }//GEN-LAST:event_menuItem_salesClerkDbActionPerformed
 
-    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+    private void menuItem_itemDbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_itemDbActionPerformed
+        ItemDb itemDb = new ItemDb(this, true);
+        int x = (getWidth() - itemDb.getWidth()) / 2;
+        int y = (getHeight() - itemDb.getHeight()) / 2;
+        itemDb.setLocation(x,y);
+        itemDb.setVisible(true);
+    }//GEN-LAST:event_menuItem_itemDbActionPerformed
+
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
         
-    }//GEN-LAST:event_jMenuItem4ActionPerformed
+    }//GEN-LAST:event_formWindowGainedFocus
     
     private void openItemDialog()
     {        
@@ -333,10 +355,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -344,5 +362,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JMenuItem menuItem_add;
+    private javax.swing.JMenuItem menuItem_findPrice;
+    private javax.swing.JMenuItem menuItem_itemDb;
+    private javax.swing.JMenuItem menuItem_remove;
+    private javax.swing.JMenuItem menuItem_salesClerkDb;
     // End of variables declaration//GEN-END:variables
 }
