@@ -9,6 +9,8 @@ public class Item {
     private String quantity;
     private String price;
     private String sold;
+    
+    private String quantityToBuy;
 
     public String getId() {
         return id;
@@ -64,6 +66,14 @@ public class Item {
 
     public void setSold(String sold) {
         this.sold = sold;
+    }
+
+    public String getQuantityToBuy() {
+        return quantityToBuy;
+    }
+
+    public void setQuantityToBuy(String quantityToBuy) {
+        this.quantityToBuy = quantityToBuy;
     }
     
 }

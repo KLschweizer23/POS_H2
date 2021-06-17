@@ -26,7 +26,7 @@ public class DB_Item {
         dbf.createTable(table, columnToKeys(true));
     }
     
-    public HashMap<String, Item> processData()
+    public HashMap<String, Item> processData(String keyword, int colIndex)
     {
         item.clear();
         idList.clear();
@@ -34,7 +34,7 @@ public class DB_Item {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, NAME);
+        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, NAME);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
         {
             Item itemObject = new Item();

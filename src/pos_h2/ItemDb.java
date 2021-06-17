@@ -2,12 +2,18 @@ package pos_h2;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
 import pos_h2_database.DB_Item;
@@ -42,7 +48,11 @@ public class ItemDb extends javax.swing.JDialog {
         dtm.addColumn("Quantity");
         dtm.addColumn("Price");
     }
-    
+    private void setup()
+    {
+        //COMMANDS
+
+    }
     private void processTable()
     {
         DB_Item itemDb = new DB_Item();
@@ -50,7 +60,7 @@ public class ItemDb extends javax.swing.JDialog {
         clearTable();
         
         idList = itemDb.getIdList();
-        item = itemDb.processData();
+        item = itemDb.processData("", 0);
         
         for(int i = 0; i < item.size(); i++)
         {
@@ -127,18 +137,6 @@ public class ItemDb extends javax.swing.JDialog {
             }
         });
     }
-    /**
-     * Creates new form ItemDb
-     */
-    public ItemDb(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
-        initComponents();
-        
-        createColumns();
-        processTable();
-        setupTable();
-        
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -178,6 +176,8 @@ public class ItemDb extends javax.swing.JDialog {
         itemTable.setRequestFocusEnabled(false);
         itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        itemTable.getTableHeader().setResizingAllowed(false);
+        itemTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(itemTable);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -372,10 +372,15 @@ public class ItemDb extends javax.swing.JDialog {
         label_id.setText("000");
         
         field_item.setText("");
+        setTextFieldFormat(field_item, true);
         field_article.setText("");
+        setTextFieldFormat(field_article, true);
         field_brand.setText("");
+        setTextFieldFormat(field_brand, true);
         field_quantity.setText("");
+        setTextFieldFormat(field_quantity, true);
         field_price.setText("");
+        setTextFieldFormat(field_price, true);
         
         button_add.setEnabled(true);
         button_update.setEnabled(false);
@@ -415,15 +420,26 @@ public class ItemDb extends javax.swing.JDialog {
     {
         if(emptyChecker(textField.getText().trim().strip()))
         {
-            textField.setBackground(Color.red);
-            textField.setForeground(Color.white);
+            setTextFieldFormat(textField, false);
             return false;
         }
         else
         {
+            setTextFieldFormat(textField, true);
+            return true;
+        }
+    }
+    private void setTextFieldFormat(JTextField textField, boolean noError)
+    {
+        if(noError)
+        {
             textField.setBackground(Color.white);
             textField.setForeground(Color.black);
-            return true;
+        }
+        else
+        {
+            textField.setBackground(Color.red);
+            textField.setForeground(Color.white);
         }
     }
     private boolean noErrorNumber(JTextField textField)
@@ -466,6 +482,18 @@ public class ItemDb extends javax.swing.JDialog {
         item.setSold("0");
         
         return item;
+    }
+    /**
+     * Creates new form ItemDb
+     */
+    public ItemDb(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+        
+        createColumns();
+        processTable();
+        setupTable();
+        setup();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_add;

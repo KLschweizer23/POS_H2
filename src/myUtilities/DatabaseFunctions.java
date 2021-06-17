@@ -109,13 +109,15 @@ public class DatabaseFunctions
      * 
      * @param table Table to retrieve Data.
      * @param column Columns of Table to retrieve Data.
+     * @param filterKey String to filter retrieving data. "" If none.
+     * @param columnIndexFilter Index of {@code column} to get column to filter data.
      * @param orderBy Orders the Data with the given column name.
      * @return Returns a HashMap with keys as your column and values as ArrayList of data in columns.
      */
-    public HashMap selectAllData(String table, String[] column, String orderBy)
+    public HashMap selectAllData(String table, String[] column, String filterKey, int columnIndexFilter, String orderBy)
     {
         HashMap<String, ArrayList> map = new HashMap();
-        String query = "SELECT * FROM " + table + " ORDER BY " + orderBy;
+        String query = "SELECT * FROM " + table + " WHERE " + column[columnIndexFilter] + " LIKE '%" + goodString(filterKey) + "%' ORDER BY " + orderBy;
         try
         {
             map = executeReturnQuery(query, column);

@@ -4,29 +4,233 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import myUtilities.MessageHandler;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
+import pos_h2_database.Item;
 
 public class MainFrame extends javax.swing.JFrame {
 
     static MainFrame myFrame;
     
+    ArrayList<String> idList = new ArrayList();
+    HashMap<String, Item> item = new HashMap<>();
+    DefaultTableModel dtm;
+    
+    int selectedRow = -1;
+    
     public MainFrame() {
         initComponents();
-        setup();
         
+        setup();
+        createColumns();
+        setHeader(displayTable, Color.WHITE, new Dimension(0,30), Color.black);
     }
     
-    public void setup()
+    private void createColumns()
     {
+        dtm = new DefaultTableModel(0,0)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        };
+        displayTable.setModel(dtm);
+        dtm.addColumn("ID");
+        dtm.addColumn("Item");
+        dtm.addColumn("Article");
+        dtm.addColumn("Brand");
+        dtm.addColumn("Quantity");
+        dtm.addColumn("Price");
+    }
+    private void processTable()
+    {
+        if(!item.isEmpty())
+        {
+            clearTable();
+            for(int i = 0; i < item.size(); i++)
+            {
+                String id = idList.get(i);
+                String[] rowData =
+                {
+                    item.get(id).getId(),
+                    item.get(id).getName(),
+                    item.get(id).getArticle(),
+                    item.get(id).getBrand(),
+                    item.get(id).getQuantityToBuy(),
+                    (char) 8369 + " " + (Double.parseDouble(item.get(id).getPrice()) * Integer.parseInt(item.get(id).getQuantityToBuy()))
+                };
+                dtm.addRow(rowData);
+            }
+            if(displayTable.getRowCount() > 0)
+                displayTable.setRowSelectionInterval(0, selectedRow);
+            displayTable.setRowHeight(30);
+            adjustViewport();
+        }
+    }
+    private void setHeader(JTable table, Color background, Dimension dim, Color foreground)
+    {
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(background);
+        headerRenderer.setPreferredSize(dim);
+        headerRenderer.setForeground(foreground);
+        
+        for (int i = 0; i < table.getModel().getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
+    }
+    private void clearTable()
+    {
+        for(int i = 0; dtm.getRowCount() != 0;)
+            dtm.removeRow(i);
+    }
+    private void setup()
+    {
+        displayTable.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                int y = p.y / 30;
+                if(y < dtm.getRowCount())
+                    displayTable.setRowSelectionInterval(0, y);
+            }
+        });
+        //FONTS || TEXTS
         Font big = new Font("Autobus Bold", Font.PLAIN, 65);
         jLabel1.setFont(big);
         button_add.setIcon(getScaledImageIcon("plus_icon.png", 25, 25));
         button_delete.setIcon(getScaledImageIcon("minus_icon.png", 25, 25));
+        
+        //COMMANDS
+        Action openItem = new AbstractAction("openItem") {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                openItemDialog();
+            }
+        };
+        button_add.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK), "openItem");
+        button_add.getActionMap().put("openItem", openItem);
+                
+        int property = JComponent.WHEN_IN_FOCUSED_WINDOW;
+        
+        getRootPane().registerKeyboardAction(e -> {
+            deleteItemAtTable();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), property);
+        
+        getRootPane().registerKeyboardAction(e -> {
+            controlTable(true);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), property);
+        
+        getRootPane().registerKeyboardAction(e -> {
+            controlTable(false);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), property);
+        
+        getRootPane().registerKeyboardAction(e ->{
+            adjustQuantityToBuy(item.get(displayTable.getValueAt(displayTable.getSelectedRow(), 0).toString()), 1);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), property);  
+        
+        getRootPane().registerKeyboardAction(e ->{
+            adjustQuantityToBuy(item.get(displayTable.getValueAt(displayTable.getSelectedRow(), 0).toString()), 1);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0), property);
+                
+        getRootPane().registerKeyboardAction(e ->{
+            adjustQuantityToBuy(item.get(displayTable.getValueAt(displayTable.getSelectedRow(), 0).toString()), -1);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), property);
+    }
+    private void controlTable(boolean goDown)
+    {
+        if(displayTable.getRowCount() > 0)
+            if(goDown)
+                if(displayTable.getSelectedRow() + 1 < displayTable.getRowCount())
+                    displayTable.setRowSelectionInterval(0, displayTable.getSelectedRow() + 1);
+                else
+                    displayTable.setRowSelectionInterval(0,0);
+            else        
+                if(displayTable.getSelectedRow() != 0)
+                    displayTable.setRowSelectionInterval(0, displayTable.getSelectedRow() - 1);
+                else
+                    displayTable.setRowSelectionInterval(0,displayTable.getRowCount() - 1);
+        
+        selectedRow = displayTable.getSelectedRow();
+        adjustViewport();
+    }
+    private void adjustViewport()
+    {
+        JViewport viewport = (JViewport)displayTable.getParent();
+        Rectangle rect = displayTable.getCellRect(displayTable.getSelectedRow(), 0, true);
+        Point pt = viewport.getViewPosition();
+        rect.setLocation(rect.x-pt.x, (rect.y-pt.y) + 30);
+        displayTable.scrollRectToVisible(rect);
+    }
+    private void adjustQuantityToBuy(Item item, int amount)
+    {
+        int current = Integer.parseInt(item.getQuantityToBuy());
+        if(!(current == 1 && amount == -1))
+            item.setQuantityToBuy(Integer.parseInt(item.getQuantityToBuy()) + amount + "");
+        selectedRow = displayTable.getSelectedRow();
+        processTable();
     }
     
+    public void addItem(Item item)
+    {
+        String id = item.getId();
+        boolean isAvailable = true;
+        
+        for(int i = 0; i < idList.size(); i++)
+            if(idList.get(i).equals(id))
+                isAvailable = false;
+        
+        if(isAvailable)
+        {
+            item.setQuantityToBuy("1");
+        
+            this.idList.add(id);
+            this.item.put(id, item);
+            selectedRow++;
+            processTable();
+        }
+    }
+    private void deleteItemAtTable()
+    {
+        if(dtm.getRowCount() > 0)
+        {
+            String id = displayTable.getValueAt(displayTable.getSelectedRow(), 0).toString();
+
+            item.remove(id);
+            dtm.removeRow(displayTable.getSelectedRow());
+
+            for(int i = 0; i < idList.size(); i++)
+                if(id.equals(idList.get(i)))
+                    idList.remove(i);
+
+            selectedRow = selectedRow == dtm.getRowCount() - 1 ? selectedRow : selectedRow - 1;
+
+            processTable();
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -41,10 +245,16 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        displayTable = new javax.swing.JTable();
         button_add = new javax.swing.JButton();
         button_delete = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        label_salesClerk = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        label_date = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuItem_add = new javax.swing.JMenuItem();
@@ -96,19 +306,23 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap(32, Short.MAX_VALUE))
         );
 
-        jPanel4.setBackground(new java.awt.Color(50, 50, 50));
+        jPanel4.setBackground(new java.awt.Color(204, 204, 204));
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel4.setFocusable(false);
 
         jScrollPane1.setBackground(new java.awt.Color(224, 224, 224));
         jScrollPane1.setBorder(null);
 
-        jTable1.setBackground(new java.awt.Color(68, 68, 68));
-        jTable1.setFillsViewportHeight(true);
-        jTable1.setFocusable(false);
-        jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jTable1.setShowGrid(false);
-        jScrollPane1.setViewportView(jTable1);
+        displayTable.setBackground(new java.awt.Color(255, 255, 255));
+        displayTable.setFillsViewportHeight(true);
+        displayTable.setFocusable(false);
+        displayTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        displayTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        displayTable.setShowGrid(false);
+        displayTable.setShowHorizontalLines(true);
+        displayTable.getTableHeader().setResizingAllowed(false);
+        displayTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(displayTable);
 
         button_add.setBackground(new java.awt.Color(204, 51, 51));
         button_add.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
@@ -163,19 +377,77 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jPanel5.setBackground(new java.awt.Color(50, 50, 50));
+        jPanel5.setBackground(new java.awt.Color(204, 204, 204));
         jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel5.setFocusable(false);
+
+        jLabel2.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("Sales Clerk");
+
+        jLabel3.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText(":");
+
+        label_salesClerk.setBackground(new java.awt.Color(255, 255, 255));
+        label_salesClerk.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        label_salesClerk.setForeground(new java.awt.Color(0, 0, 0));
+        label_salesClerk.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        label_salesClerk.setText("Name");
+
+        jLabel4.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel4.setText("Date");
+
+        jLabel5.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel5.setText(":");
+
+        label_date.setBackground(new java.awt.Color(255, 255, 255));
+        label_date.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        label_date.setForeground(new java.awt.Color(0, 0, 0));
+        label_date.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        label_date.setText("Date");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 368, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel5))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel3)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(label_salesClerk)
+                    .addComponent(label_date))
+                .addContainerGap(208, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(54, 54, 54)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3)
+                    .addComponent(label_salesClerk))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(label_date))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -213,7 +485,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(menuItem_add);
 
-        menuItem_remove.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_remove.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DELETE, 0));
         menuItem_remove.setText("Remove Item");
         jMenu1.add(menuItem_remove);
 
@@ -270,7 +542,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_button_addActionPerformed
 
     private void button_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_deleteActionPerformed
-        
+        deleteItemAtTable();
     }//GEN-LAST:event_button_deleteActionPerformed
 
     private void menuItem_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_addActionPerformed
@@ -350,7 +622,12 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_add;
     private javax.swing.JButton button_delete;
+    private javax.swing.JTable displayTable;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -360,7 +637,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JLabel label_date;
+    private javax.swing.JLabel label_salesClerk;
     private javax.swing.JMenuItem menuItem_add;
     private javax.swing.JMenuItem menuItem_findPrice;
     private javax.swing.JMenuItem menuItem_itemDb;
