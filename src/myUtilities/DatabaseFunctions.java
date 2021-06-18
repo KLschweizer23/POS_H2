@@ -66,7 +66,7 @@ public class DatabaseFunctions
             {
                 executeQuery(insert);
             }catch(SQLException sqlE){mh.error("There was an error inserting into the Table '" + tableName + "'! Error Message: " + sqlE);}
-        }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column is greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");
+        }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column should be greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");
     }
     
     /**

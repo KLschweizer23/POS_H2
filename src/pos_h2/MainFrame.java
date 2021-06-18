@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.AbstractAction;
@@ -23,15 +25,18 @@ import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
+import pos_h2_database.Clerk;
 
 import pos_h2_database.Item;
 
 public class MainFrame extends javax.swing.JFrame {
-
     static MainFrame myFrame;
     
     ArrayList<String> idList = new ArrayList();
     HashMap<String, Item> item = new HashMap<>();
+    
+    Clerk currentClerk;
+    
     DefaultTableModel dtm;
     
     int selectedRow = -1;
@@ -39,11 +44,35 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         
+        do
+            loginForm();
+        while(currentClerk == null);
+        
+        setDetails();        
         setup();
         createColumns();
         setHeader(table_display, Color.WHITE, new Dimension(0,30), Color.black);
     }
-    
+    private void setDetails()
+    {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        LocalDateTime now = LocalDateTime.now();  
+        String date = dtf.format(now);
+        
+        String clerkName = currentClerk.getFirstname() + " " + currentClerk.getMiddlename().charAt(0) + ". " + currentClerk.getLastname().charAt(0) + ".";
+        
+        label_salesClerk.setText(clerkName);
+        label_date.setText(date);
+        
+    }
+    private void loginForm()
+    {
+        LoginForm login = new LoginForm(this, true);
+        int x = (getWidth() - login.getWidth()) / 2;
+        int y = (getHeight() - login.getHeight()) / 2;
+        login.setLocation(x,y);
+        login.setVisible(true);
+    }
     private void createColumns()
     {
         dtm = new DefaultTableModel(0,0)
@@ -300,6 +329,10 @@ public class MainFrame extends javax.swing.JFrame {
         item.clear();
         idList.clear();
         field_payment.setText("");
+    }
+    public void setCurrentClerk (Clerk clerk)
+    {
+        currentClerk = clerk;
     }
     /**
      * This method is called from within the constructor to initialize the form.

@@ -168,6 +168,7 @@ public class ItemDb extends javax.swing.JDialog {
         label_id = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         jScrollPane1.setFocusable(false);
 
@@ -221,6 +222,9 @@ public class ItemDb extends javax.swing.JDialog {
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel4.setText("Quantity");
         jLabel4.setFocusable(false);
+
+        field_quantity.setText("0");
+        field_quantity.setEnabled(false);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setText("Price");
@@ -396,10 +400,12 @@ public class ItemDb extends javax.swing.JDialog {
         setTextFieldFormat(field_article, true);
         field_brand.setText("");
         setTextFieldFormat(field_brand, true);
-        field_quantity.setText("");
+        field_quantity.setText("0");
         setTextFieldFormat(field_quantity, true);
         field_price.setText("");
         setTextFieldFormat(field_price, true);
+        
+        field_quantity.setEnabled(false);
         
         button_add.setEnabled(true);
         button_update.setEnabled(false);
@@ -485,6 +491,8 @@ public class ItemDb extends javax.swing.JDialog {
         field_article.setText(item.getArticle());
         field_quantity.setText(item.getQuantity());
         field_price.setText(item.getPrice());
+        
+        field_quantity.setEnabled(true);
         
         button_add.setEnabled(false);
         button_update.setEnabled(true);

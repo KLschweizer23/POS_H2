@@ -190,6 +190,7 @@ public class ItemDialog extends javax.swing.JDialog {
         field_filter = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         jScrollPane1.setFocusable(false);
 
