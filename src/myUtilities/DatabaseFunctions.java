@@ -265,7 +265,7 @@ public class DatabaseFunctions
      */
     public String likeEquals (String data)
     {
-        return " LIKE %" + data + "%";
+        return " LIKE %" + goodString(data) + "%";
     }
     
     /**
@@ -286,7 +286,7 @@ public class DatabaseFunctions
      */
     public String whereEquals (String column, String data)
     {
-        return " WHERE " + column + " = '" + data + "' ";
+        return " WHERE " + column + " = '" + goodString(data) + "' ";
     }
     
     /**
@@ -297,7 +297,7 @@ public class DatabaseFunctions
      */
     public String whereNotEquals (String column, String data)
     {
-        return " WHERE " + column + " != '" + data + "' ";
+        return " WHERE " + column + " != '" + goodString(data) + "' ";
     }
     
     /**
@@ -308,7 +308,7 @@ public class DatabaseFunctions
      */
     public String andEquals (String column, String data)
     {
-        return "AND " + column + " = '" + data + "'";
+        return "AND " + column + " = '" + goodString(data) + "'";
     }    
     
     /**
@@ -319,7 +319,7 @@ public class DatabaseFunctions
      */
     public String andNotEquals (String column, String data)
     {
-        return "AND " + column + " != '" + data + "'";
+        return "AND " + column + " != '" + goodString(data) + "'";
     }
   
     /**
@@ -424,6 +424,11 @@ public class DatabaseFunctions
         return colAndAttr;
     }
     
+    /**
+     * 
+     * @param array Array to modify and remove first item.
+     * @return Returns the same array with it's first item removed.
+     */
     private String[] removeFirstItem(String[] array)
     {
         String[] newArray = new String[array.length - 1];

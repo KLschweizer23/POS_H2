@@ -2,7 +2,6 @@ package pos_h2_database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.table.DefaultTableModel;
 import myUtilities.DatabaseFunctions;
 
 public class DB_Item {
@@ -64,6 +63,12 @@ public class DB_Item {
     {
         DatabaseFunctions df = new DatabaseFunctions();
         df.updateData(table, columnToKeys(false), dataToKeys(item, false));
+    }
+    
+    public void deleteData(Item item)
+    {
+        DatabaseFunctions df = new DatabaseFunctions();
+        df.deleteData(table, ID, item.getId());
     }
     
     public String[] dataToKeys(Item item, boolean removeFirstItem)
