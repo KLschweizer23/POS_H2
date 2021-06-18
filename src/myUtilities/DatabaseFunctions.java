@@ -64,6 +64,7 @@ public class DatabaseFunctions
             String insert = "INSERT INTO " + tableName + "(" + arrayToString(column, true, false, false) + ") VALUES (" + arrayToString(data, false, true, true) + ");";
             try
             {
+                System.out.println(insert);
                 executeQuery(insert);
             }catch(SQLException sqlE){mh.error("There was an error inserting into the Table '" + tableName + "'! Error Message: " + sqlE);}
         }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column should be greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");

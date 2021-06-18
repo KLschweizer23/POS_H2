@@ -26,8 +26,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
 import pos_h2_database.Clerk;
+import pos_h2_database.DB_Transaction;
 
 import pos_h2_database.Item;
+import pos_h2_database.Transaction;
 
 public class MainFrame extends javax.swing.JFrame {
     static MainFrame myFrame;
@@ -322,7 +324,33 @@ public class MainFrame extends javax.swing.JFrame {
     private void makeTransaction()
     {
         MessageHandler mh = new MessageHandler();
-        
+        if(item.size() > 0)
+        {
+            for(int i = 0; i < item.size(); i++)
+            {
+                String id = table_display.getValueAt(i, 0).toString();
+                
+                DB_Transaction tDb = new DB_Transaction();
+                Transaction transaction = new Transaction();
+                
+                transaction.setT_id("");
+                transaction.setT_clerk(currentClerk.getName());
+                transaction.setDate(label_date.getText());
+                
+                Item newItem = new Item();
+                ArrayList<Item> listOfItem = new ArrayList<>();
+                
+                newItem.setId(item.get(id).getId());
+                newItem.setQuantityToBuy(item.get(id).getQuantityToBuy());
+                newItem.setPrice(item.get(id).getPrice());
+                
+                listOfItem.add(newItem);
+                
+                transaction.setItem(listOfItem);
+                
+                tDb.insertData(transaction);
+            }
+        } else mh.warning("There is no item to buy!");
     }
     private void cancelTransaction()
     {
