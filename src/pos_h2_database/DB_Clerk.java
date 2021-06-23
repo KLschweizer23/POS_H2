@@ -54,8 +54,7 @@ public class DB_Clerk {
             clerkObject.setUser(user);
             clerkObject.setPassword(pass);
             
-            String name = lName + "." + fName.charAt(0) + "." + lName.charAt(0) + "." + id;
-            
+            String name = lName + "." + fName.charAt(0) + "." + mName.charAt(0) + "." + id;
             clerkObject.setName(name);
             
             clerk.put(id, clerkObject);

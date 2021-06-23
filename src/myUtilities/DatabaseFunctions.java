@@ -220,7 +220,9 @@ public class DatabaseFunctions
         
         for(int i = removeFirstItem ? 1 : 0; i < array.length; i++)
         {
+            System.out.println(returnVal);
             returnVal += "," + isDataChar + (isBadString ? goodString(array[i]) : array[i]) + isDataChar;
+            System.out.println(returnVal + " - f");
         }
         
         returnVal = returnVal.substring(1);
@@ -253,6 +255,9 @@ public class DatabaseFunctions
      */
     private String goodString(String data)
     {
+        if(data == null)
+            return null;
+        
         String temp = data.replaceAll("'", "\\\\'");
         return temp;
     }

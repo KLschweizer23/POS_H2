@@ -324,33 +324,41 @@ public class MainFrame extends javax.swing.JFrame {
     private void makeTransaction()
     {
         MessageHandler mh = new MessageHandler();
-        if(item.size() > 0)
+        if(!currentClerk.getFirstname().equals("admin"))
         {
-            for(int i = 0; i < item.size(); i++)
+            if(!field_payment.getText().isBlank())
             {
-                String id = table_display.getValueAt(i, 0).toString();
-                
-                DB_Transaction tDb = new DB_Transaction();
-                Transaction transaction = new Transaction();
-                
-                transaction.setT_id("");
-                transaction.setT_clerk(currentClerk.getName());
-                transaction.setDate(label_date.getText());
-                
-                Item newItem = new Item();
-                ArrayList<Item> listOfItem = new ArrayList<>();
-                
-                newItem.setId(item.get(id).getId());
-                newItem.setQuantityToBuy(item.get(id).getQuantityToBuy());
-                newItem.setPrice(item.get(id).getPrice());
-                
-                listOfItem.add(newItem);
-                
-                transaction.setItem(listOfItem);
-                
-                tDb.insertData(transaction);
-            }
-        } else mh.warning("There is no item to buy!");
+                if(item.size() > 0)
+                {
+                    for(int i = 0; i < item.size(); i++)
+                    {
+                        String id = table_display.getValueAt(i, 0).toString();
+ 
+                        item.get(id).setQuantityToBuy(table_display.getValueAt(i, 4).toString());
+                        
+                        DB_Transaction tDb = new DB_Transaction();
+                        Transaction transaction = new Transaction();
+
+                        transaction.setT_id(1 + "");
+                        transaction.setT_clerk(currentClerk.getName());
+                        transaction.setDate(label_date.getText());
+
+                        Item newItem = new Item();
+                        ArrayList<Item> listOfItem = new ArrayList<>();
+
+                        newItem.setId(item.get(id).getId());
+                        newItem.setQuantity(item.get(id).getQuantityToBuy());
+                        newItem.setPrice(item.get(id).getPrice());
+
+                        listOfItem.add(newItem);
+
+                        transaction.setItem(listOfItem);
+
+                        tDb.insertData(transaction);
+                    }
+                } else mh.warning("There is no item to buy!");
+            } else mh.warning("Invalid payment!");
+        } else mh.warning("There are no sales clerk!");
     }
     private void cancelTransaction()
     {
@@ -518,7 +526,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap(898, Short.MAX_VALUE)
+                        .addContainerGap(912, Short.MAX_VALUE)
                         .addComponent(button_add, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -754,54 +762,52 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jSeparator4)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel10)
-                                .addGap(40, 40, 40)
-                                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(jLabel4)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jLabel5))
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jLabel3)))
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(jLabel8)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jLabel9))
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(jLabel6)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jLabel7)))
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addGroup(jPanel5Layout.createSequentialGroup()
-                                    .addComponent(jLabel12)
-                                    .addGap(32, 32, 32)
-                                    .addComponent(jLabel13)
+                                    .addComponent(jLabel4)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel5))
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(jLabel2)
                                     .addGap(18, 18, 18)
-                                    .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(field_payment, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel16))))
-                        .addGap(0, 64, Short.MAX_VALUE))
+                                    .addComponent(jLabel3)))
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(jLabel8)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel9))
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(jLabel6)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jLabel7)))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel12)
+                                        .addGap(32, 32, 32))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel10)
+                                        .addGap(39, 39, 39)))
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel13)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(label_balance)
+                                    .addComponent(field_payment, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel16)))
+                        .addGap(0, 48, Short.MAX_VALUE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jSeparator9, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(label_balance)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel17)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator8))))
+                        .addComponent(jLabel17)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator8))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -927,10 +933,20 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         jMenuItem1.setText("Make Transaction");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_BACK_SPACE, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         jMenuItem2.setText("Cancel Transaction");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
@@ -999,11 +1015,15 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void salesClerkDb()
     {
-        ClerkDb clerkDb = new ClerkDb(this, true);
-        int x = (getWidth() - clerkDb.getWidth()) / 2;
-        int y = (getHeight() - clerkDb.getHeight()) / 2;
-        clerkDb.setLocation(x,y);
-        clerkDb.setVisible(true);
+        MessageHandler mh = new MessageHandler();
+        if(currentClerk.getFirstname().equals("admin"))
+        {
+            ClerkDb clerkDb = new ClerkDb(this, true);
+            int x = (getWidth() - clerkDb.getWidth()) / 2;
+            int y = (getHeight() - clerkDb.getHeight()) / 2;
+            clerkDb.setLocation(x,y);
+            clerkDb.setVisible(true);
+        } else mh.warning("Non-admin are not authorized with this function!");
     }
             
     private void menuItem_itemDbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_itemDbActionPerformed
@@ -1012,11 +1032,15 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void itemDb()
     {
-        ItemDb itemDb = new ItemDb(this, true);
-        int x = (getWidth() - itemDb.getWidth()) / 2;
-        int y = (getHeight() - itemDb.getHeight()) / 2;
-        itemDb.setLocation(x,y);
-        itemDb.setVisible(true);
+        MessageHandler mh = new MessageHandler();
+        if(currentClerk.getFirstname().equals("admin"))
+        {
+            ItemDb itemDb = new ItemDb(this, true);
+            int x = (getWidth() - itemDb.getWidth()) / 2;
+            int y = (getHeight() - itemDb.getHeight()) / 2;
+            itemDb.setLocation(x,y);
+            itemDb.setVisible(true);
+        } else mh.warning("Non-admin are not authorized with this function!");
     }
     
     private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
@@ -1034,6 +1058,14 @@ public class MainFrame extends javax.swing.JFrame {
     private void field_paymentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_field_paymentKeyReleased
         checkBalance(getTotalAmount());
     }//GEN-LAST:event_field_paymentKeyReleased
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        makeTransaction();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        cancelTransaction();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
     
     private void openItemDialog()
     {        

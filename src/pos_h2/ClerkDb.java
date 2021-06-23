@@ -45,8 +45,8 @@ public class ClerkDb extends javax.swing.JDialog {
         clerkTable.setModel(dtm);
         dtm.addColumn("ID");
         dtm.addColumn("Firstname");
-        dtm.addColumn("Lastname");
         dtm.addColumn("Middlename");
+        dtm.addColumn("Lastname");
         dtm.addColumn("Username");
         dtm.addColumn("Password");
     }
