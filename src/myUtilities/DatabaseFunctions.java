@@ -45,10 +45,7 @@ public class DatabaseFunctions
         try
         {
             executeQuery(create);
-        }catch(SQLException sqlE){mh.error("<html>There was an error creating The Table!<br><b>Error:</b><br>"
-                + sqlE.toString().substring(0, sqlE.toString().length() / 2) + "<br>"
-                + sqlE.toString().substring(sqlE.toString().length()/ 2) + "<br>"
-                + "</html>");}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error creating the table " + tableName + "!", sqlE.toString()));}
     }
     
     /**
@@ -66,7 +63,7 @@ public class DatabaseFunctions
             {
                 System.out.println(insert);
                 executeQuery(insert);
-            }catch(SQLException sqlE){mh.error("There was an error inserting into the Table '" + tableName + "'! Error Message: " + sqlE);}
+            }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error inserting into the Table " + tableName + "!", sqlE.toString()));}
         }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column should be greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");
     }
     
@@ -90,11 +87,16 @@ public class DatabaseFunctions
             {
                 System.out.println(update);
                 executeQuery(update);
-            }catch(SQLException sqlE){mh.error("There was an error updating the Table '" + tableName + "'! Error Message: " + sqlE);}
+            }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error updating the Table " + tableName + "!", sqlE.toString()));}
         }else mh.error("Column size and Data size doesn't match. There should be no difference. column: " + column.length + "; data: " + data.length);
     }    
     
-    
+    /**
+     * 
+     * @param tableName Name of the table to delete data.
+     * @param column Name of Column of the table for condition.
+     * @param data data to be deleted that is on the column on {@code column}.
+     */
     public void deleteData(String tableName, String column, String data)
     {
         String condition = whereEquals(column, data);
@@ -103,7 +105,7 @@ public class DatabaseFunctions
         try
         {
             executeQuery(delete);
-        }catch(SQLException sqlE){mh.error("<html>There was an error deleting data in the Table '" + tableName + "'! <br><b>Error Message:</b><br> " + sqlE + "</html>");}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error deleting data in the Table " + tableName + "!", sqlE.toString()));}
     }
     
     /**
@@ -122,7 +124,24 @@ public class DatabaseFunctions
         try
         {
             map = executeReturnQuery(query, column);
-        }catch(SQLException sqlE){mh.error("There was an error Retrieving Data from Database -> '" + query + "'! Error Message: " + sqlE);}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error Retrieving Data from Database -> '" + query + "'!", sqlE.toString()));}
+        return map;
+    }
+    
+    /**
+     * 
+     * @param query Your query to execute.
+     * @param keyName Name of column and also to retrieve data on ResultSet
+     * @return Returns a {@code HashMap<String, ArrayList>} with the data on ArrayList and key as {@code keyName}.
+     */
+    public HashMap customQuery(String query, String[] keyName)
+    {
+        HashMap<String, ArrayList> map = new HashMap<>();
+        try
+        {
+            map = executeReturnQuery(query, keyName);
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error performing this query ->'" + query + "'!", sqlE.toString()));}
+        
         return map;
     }
     
@@ -441,5 +460,22 @@ public class DatabaseFunctions
         for(int i = 1; i < array.length; i++)
             newArray[i - 1] = array[i];
         return newArray;
+    }
+    
+    /**
+     * 
+     * @param firstMessage Personal Message.
+     * @param exceptionMessage Message of the exception to manage.
+     * @return Returns a String with {@code <html>} tags to create multiple lines.
+     */
+    private String manageErrorMessage(String firstMessage, String exceptionMessage)
+    {
+        int half = exceptionMessage.length() / 2;
+        
+        String returnString = "<html>" + firstMessage + "<br><b>Error:</b><br>" + 
+                exceptionMessage.substring(0, half) + "<br>" +
+                exceptionMessage.substring(half) + "</html>";
+        
+        return returnString;
     }
 }

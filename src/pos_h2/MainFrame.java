@@ -19,11 +19,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import myUtilities.DatabaseFunctions;
 import myUtilities.MessageHandler;
 import pos_h2_database.Clerk;
 import pos_h2_database.DB_Transaction;
@@ -46,14 +48,17 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         
-        do
-            loginForm();
-        while(currentClerk == null);
-        
+        login();
         setDetails();        
         setup();
         createColumns();
         setHeader(table_display, Color.WHITE, new Dimension(0,30), Color.black);
+    }
+    private void login()
+    {
+        do
+            loginForm();
+        while(currentClerk == null);
     }
     private void setDetails()
     {
@@ -114,10 +119,10 @@ public class MainFrame extends javax.swing.JFrame {
             }
             if(table_display.getRowCount() > 0)
                 table_display.setRowSelectionInterval(0, selectedRow);
-            table_display.setRowHeight(30);
-            adjustViewport();
-            updateStatus();
         }
+        table_display.setRowHeight(30);
+        adjustViewport();
+        updateStatus();
     }
     private void setHeader(JTable table, Color background, Dimension dim, Color foreground)
     {
@@ -190,8 +195,16 @@ public class MainFrame extends javax.swing.JFrame {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0), property);
                 
         getRootPane().registerKeyboardAction(e ->{
+            adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), 1);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), property);
+                
+        getRootPane().registerKeyboardAction(e ->{
             adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), -1);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), property);
+                
+        getRootPane().registerKeyboardAction(e ->{
+            adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), -1);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), property);
         
         getRootPane().registerKeyboardAction(e ->{
             makeTransaction();
@@ -326,20 +339,24 @@ public class MainFrame extends javax.swing.JFrame {
         MessageHandler mh = new MessageHandler();
         if(!currentClerk.getFirstname().equals("admin"))
         {
-            if(!field_payment.getText().isBlank())
+            if(item.size() > 0)
             {
-                if(item.size() > 0)
+                double payment = Double.parseDouble(field_payment.getText());
+                double totalAmount = Double.parseDouble(label_totalAmount.getText().substring(2));
+                if(!field_payment.getText().isBlank() && payment >= totalAmount)
                 {
+                    DB_Transaction tDb = new DB_Transaction();
+                    String tId = tDb.getAvailableTID();
+                    
                     for(int i = 0; i < item.size(); i++)
                     {
                         String id = table_display.getValueAt(i, 0).toString();
  
                         item.get(id).setQuantityToBuy(table_display.getValueAt(i, 4).toString());
                         
-                        DB_Transaction tDb = new DB_Transaction();
                         Transaction transaction = new Transaction();
 
-                        transaction.setT_id(1 + "");
+                        transaction.setT_id(tId);
                         transaction.setT_clerk(currentClerk.getName());
                         transaction.setDate(label_date.getText());
 
@@ -356,8 +373,12 @@ public class MainFrame extends javax.swing.JFrame {
 
                         tDb.insertData(transaction);
                     }
-                } else mh.warning("There is no item to buy!");
-            } else mh.warning("Invalid payment!");
+                    mh.message("<html>Transaction was finished!<br>Press <b>OK</b> to continue...</html>");
+                    cancelTransaction();
+                    processTable();
+                    
+                } else mh.warning("Invalid payment!");
+            } else mh.warning("There are no items to buy!");
         } else mh.warning("There are no sales clerk!");
     }
     private void cancelTransaction()
@@ -365,6 +386,10 @@ public class MainFrame extends javax.swing.JFrame {
         item.clear();
         idList.clear();
         field_payment.setText("");
+        selectedRow = -1;
+        for(int i = dtm.getRowCount() - 1; i >= 0; i--)
+            dtm.removeRow(i);
+        processTable();
     }
     public void setCurrentClerk (Clerk clerk)
     {
@@ -429,6 +454,9 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         menuItem_findPrice = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
@@ -948,6 +976,24 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem2);
+        jMenu1.add(jSeparator3);
+
+        jMenuItem3.setText("Logout");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
+
+        jMenuItem4.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_DOWN_MASK));
+        jMenuItem4.setText("Exit");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem4);
 
         jMenuBar1.add(jMenu1);
 
@@ -1066,6 +1112,19 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         cancelTransaction();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        currentClerk = null;
+        dispose();
+        myFrame = new MainFrame();
+        myFrame.setVisible(true);
+        myFrame.setExtendedState(myFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        myFrame.setMaximumSize(myFrame.getSize());
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
     
     private void openItemDialog()
     {        
@@ -1112,6 +1171,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 myFrame = new MainFrame();
                 myFrame.setVisible(true);
@@ -1151,6 +1211,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1159,6 +1221,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;

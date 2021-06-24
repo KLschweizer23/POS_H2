@@ -33,7 +33,7 @@ public class DB_Transaction {
         String[] keys = columnToKeys(false);
         
         HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, T_ID);
-        for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
+        for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++ )
         {
             Transaction transactionObject = new Transaction();
             String id = map.get(ID).get(i).toString();
@@ -63,6 +63,40 @@ public class DB_Transaction {
     {
         DatabaseFunctions df = new DatabaseFunctions();
         df.insertData(table, columnToKeys(false), dataToKeys(transaction, true));
+    }
+    
+    public String getAvailableTID()
+    {
+        DatabaseFunctions df = new DatabaseFunctions();
+        String myQuery = "SELECT DISTINCT(" + T_ID + ") FROM " + table + " ORDER BY " + T_ID + " ASC ";
+        String[] keys = {T_ID};
+        
+        HashMap<String, ArrayList> data = df.customQuery(myQuery, keys);
+        ArrayList<String> idList = data.get(T_ID);
+        int availableValue = getAvailableValue(idList);
+        return availableValue + "";
+    }
+    
+    private int getAvailableValue(ArrayList<String> list)
+    {
+        int lastNum = Integer.parseInt(list.get(list.size() - 1));
+        list.add(null);
+        int availableNum = 0;
+        
+        for(int i = 1; i <= lastNum + 1; i++)
+        {
+            availableNum = i;
+            if(list.get(i - 1) != null)
+            {
+                if(availableNum != Integer.parseInt(list.get(i - 1)))
+                    return availableNum;
+            }
+            else
+            {
+                return availableNum;
+            }
+        }
+        return availableNum;
     }
     
     public String[] dataToKeys(Transaction transaction, boolean removeFirstItem)
