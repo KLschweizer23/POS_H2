@@ -443,9 +443,12 @@ public class MainFrame extends javax.swing.JFrame {
     private void updateQuantity(Item item)
     {
         int currentQuantity = Integer.parseInt(item.getQuantity());
+        int currentSold = Integer.parseInt(item.getSold());
+        
         int quantityToBuy = Integer.parseInt(item.getQuantityToBuy());
         
         item.setQuantity((currentQuantity - quantityToBuy) + "");
+        item.setSold((currentSold + quantityToBuy) + "");
         
         DB_Item itemDb = new DB_Item();
         itemDb.updateData(item);
