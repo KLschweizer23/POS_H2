@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -14,10 +13,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JViewport;
@@ -26,6 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
 import pos_h2_database.Clerk;
+import pos_h2_database.DB_Item;
 import pos_h2_database.DB_Transaction;
 
 import pos_h2_database.Item;
@@ -39,18 +37,22 @@ public class MainFrame extends javax.swing.JFrame {
     
     Clerk currentClerk;
     
-    DefaultTableModel dtm;
+    DefaultTableModel dtm, dtm2;
     
     int selectedRow = -1;
     
     public MainFrame() {
         initComponents();
         
-        login();
-        setDetails();        
-        setup();
         createColumns();
+        createColumns2();
+        login();
+        setDetails();   
+        updateHistory();
+        setup();
         setHeader(table_display, Color.WHITE, new Dimension(0,30), Color.black);
+        
+        menu_database.setEnabled(currentClerk.getFirstname().equals("admin"));
     }
     private void login()
     {
@@ -69,6 +71,35 @@ public class MainFrame extends javax.swing.JFrame {
         label_salesClerk.setText(clerkName);
         label_date.setText(date);
         
+    }
+    private void updateHistory()
+    {
+        for(int i = 0; dtm2.getRowCount() != 0;)
+            dtm2.removeRow(i);
+        DB_Transaction tDb = new DB_Transaction();
+        HashMap<String, Transaction> transactions = tDb.processData();
+        ArrayList<String> idLists = tDb.getIdList();
+        for(int i = idLists.size() - 1; i >= 0; i--)
+        {
+            Transaction trans = transactions.get(idLists.get(i));
+            String[] rowData = {
+                trans.getT_id(),
+                (char)8369 + " " + getTotalAmount(trans.getItem()),
+                trans.getDate()
+            };
+            dtm2.addRow(rowData);
+        }
+    }
+    private double getTotalAmount(ArrayList<Item> item)
+    {
+        double totalAmount = 0;
+        for(int i = 0; i < item.size(); i++)
+        {
+            double price = Double.parseDouble(item.get(i).getPrice());
+            double quantity = Double.parseDouble(item.get(i).getQuantity());
+            totalAmount += price * quantity;
+        }
+        return totalAmount;
     }
     private void loginForm()
     {
@@ -95,6 +126,21 @@ public class MainFrame extends javax.swing.JFrame {
         dtm.addColumn("Brand");
         dtm.addColumn("Quantity");
         dtm.addColumn("Price");
+    }
+    private void createColumns2()
+    {
+        dtm2 = new DefaultTableModel(0,0)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        };
+        table_history.setModel(dtm2);
+        dtm2.addColumn("ID");
+        dtm2.addColumn("Amount");
+        dtm2.addColumn("Date");
     }
     private void processTable()
     {
@@ -161,16 +207,16 @@ public class MainFrame extends javax.swing.JFrame {
         button_delete.setIcon(getScaledImageIcon("minus_icon.png", 25, 25));
         
         //COMMANDS
-        Action openItem = new AbstractAction("openItem") {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                openItemDialog(false);
-            }
-        };
-        getRootPane().getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "openItem");
-        getRootPane().getActionMap().put("openItem", openItem);
                 
         int property = JComponent.WHEN_IN_FOCUSED_WINDOW;
+        
+        getRootPane().registerKeyboardAction(e -> {
+                openItemDialog(false);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_DOWN_MASK), property);
+        
+        getRootPane().registerKeyboardAction(e -> {
+                openItemDialog(false);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), property);
         
         getRootPane().registerKeyboardAction(e -> {
             deleteItemAtTable();
@@ -384,14 +430,25 @@ public class MainFrame extends javax.swing.JFrame {
                         transaction.setItem(listOfItem);
 
                         tDb.insertData(transaction);
+                        updateQuantity(item.get(id));
                     }
                     mh.message("<html>Transaction was finished!<br>Press <b>OK</b> to continue...</html>");
                     cancelTransaction();
+                    updateHistory();
                     processTable();
-                    
                 } else mh.warning("Invalid payment!");
             } else mh.warning("There are no items to buy!");
         } else mh.warning("There are no sales clerk!");
+    }
+    private void updateQuantity(Item item)
+    {
+        int currentQuantity = Integer.parseInt(item.getQuantity());
+        int quantityToBuy = Integer.parseInt(item.getQuantityToBuy());
+        
+        item.setQuantity((currentQuantity - quantityToBuy) + "");
+        
+        DB_Item itemDb = new DB_Item();
+        itemDb.updateData(item);
     }
     private void cancelTransaction()
     {
@@ -471,7 +528,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         menuItem_findPrice = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        menu_database = new javax.swing.JMenu();
         menuItem_itemDb = new javax.swing.JMenuItem();
         menuItem_salesClerkDb = new javax.swing.JMenuItem();
         jSeparator10 = new javax.swing.JPopupMenu.Separator();
@@ -959,7 +1016,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu1.setText("File");
 
-        menuItem_add.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_add.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, java.awt.event.InputEvent.ALT_DOWN_MASK));
         menuItem_add.setText("Add Item");
         menuItem_add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1019,7 +1076,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("Database");
+        menu_database.setText("Database");
+        menu_database.setEnabled(false);
 
         menuItem_itemDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItem_itemDb.setText("Item Database");
@@ -1028,7 +1086,7 @@ public class MainFrame extends javax.swing.JFrame {
                 menuItem_itemDbActionPerformed(evt);
             }
         });
-        jMenu3.add(menuItem_itemDb);
+        menu_database.add(menuItem_itemDb);
 
         menuItem_salesClerkDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItem_salesClerkDb.setText("Sales Clerk Database");
@@ -1037,8 +1095,8 @@ public class MainFrame extends javax.swing.JFrame {
                 menuItem_salesClerkDbActionPerformed(evt);
             }
         });
-        jMenu3.add(menuItem_salesClerkDb);
-        jMenu3.add(jSeparator10);
+        menu_database.add(menuItem_salesClerkDb);
+        menu_database.add(jSeparator10);
 
         jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ADD, java.awt.event.InputEvent.ALT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
         jMenuItem5.setText("Add Stocks");
@@ -1047,9 +1105,9 @@ public class MainFrame extends javax.swing.JFrame {
                 jMenuItem5ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem5);
+        menu_database.add(jMenuItem5);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(menu_database);
 
         setJMenuBar(jMenuBar1);
 
@@ -1061,7 +1119,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
         );
 
         pack();
@@ -1233,7 +1291,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -1266,6 +1323,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem_itemDb;
     private javax.swing.JMenuItem menuItem_remove;
     private javax.swing.JMenuItem menuItem_salesClerkDb;
+    private javax.swing.JMenu menu_database;
     private javax.swing.JTable table_display;
     private javax.swing.JTable table_history;
     // End of variables declaration//GEN-END:variables

@@ -24,7 +24,7 @@ public class DB_Transaction {
         dbf.createTable(table, columnToKeys(true));
     }
     
-    public HashMap<String, Transaction> processData(String keyword, int colIndex)
+    public HashMap<String, Transaction> processData()
     {
         transaction.clear();
         idList.clear();
@@ -32,14 +32,14 @@ public class DB_Transaction {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, T_ID);
-        for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++ )
+        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, "", 0, T_ID);
+        for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size());)
         {
             Transaction transactionObject = new Transaction();
-            String id = map.get(ID).get(i).toString();
+            String id = map.get(T_ID).get(i).toString();
             
             transactionObject.setId(id);
-            transactionObject.setT_id(map.get(T_ID).get(i).toString());
+            transactionObject.setT_id(id);
             transactionObject.setT_clerk(map.get(T_CLERK).get(i).toString());
             transactionObject.setDate(map.get(DATE).get(i).toString());
             ArrayList<Item> listOfItems = new ArrayList<>();
@@ -51,7 +51,7 @@ public class DB_Transaction {
                 item.setPrice(map.get(I_PRICE).get(i).toString());
                 listOfItems.add(item);
                 i++;
-            }while(map.get(T_ID).get(i - 1).toString().equals(map.get(T_ID).get(i).toString()));
+            }while(i < map.get(ID).size() && map.get(T_ID).get(i - 1).toString().equals(map.get(T_ID).get(i).toString()));
             transactionObject.setItem(listOfItems);
             transaction.put(id, transactionObject);
             idList.add(id);
