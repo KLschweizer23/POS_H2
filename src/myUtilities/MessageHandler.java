@@ -21,4 +21,9 @@ public class MessageHandler
     {
         JOptionPane.showMessageDialog(null, message, "System Warning", JOptionPane.WARNING_MESSAGE);
     }
+    public String input(String message)
+    {
+        String in = JOptionPane.showInputDialog(null, message, "");
+        return in;
+    }
 }

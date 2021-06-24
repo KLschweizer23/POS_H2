@@ -164,7 +164,7 @@ public class MainFrame extends javax.swing.JFrame {
         Action openItem = new AbstractAction("openItem") {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                openItemDialog();
+                openItemDialog(false);
             }
         };
         getRootPane().getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "openItem");
@@ -219,6 +219,10 @@ public class MainFrame extends javax.swing.JFrame {
         getRootPane().registerKeyboardAction(e ->{
             salesClerkDb();
         }, KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), property);
+                
+        getRootPane().registerKeyboardAction(e ->{
+            openItemDialog(true);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ADD, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), property);
     }
     private void controlTable(boolean goDown)
     {
@@ -247,9 +251,19 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void adjustQuantityToBuy(Item item, int amount)
     {
+        MessageHandler mh = new MessageHandler();
+        
         int current = Integer.parseInt(item.getQuantityToBuy());
         if(!(current == 1 && amount == -1))
-            item.setQuantityToBuy(Integer.parseInt(item.getQuantityToBuy()) + amount + "");
+        {
+            int currentQuantity = Integer.parseInt(item.getQuantity());
+            if(current + amount > currentQuantity)
+                mh.warning("<html>There's not enough stocks for this item!<br>"
+                        + "Item: <b>" + item.getName() + "</b><br>"
+                                + "Quantity: <b>" + item.getQuantity() + "</b><br></html>");
+            else
+                item.setQuantityToBuy(current + amount + "");
+        }
         selectedRow = table_display.getSelectedRow();
         processTable();
     }
@@ -339,7 +353,7 @@ public class MainFrame extends javax.swing.JFrame {
         {
             if(item.size() > 0)
             {
-                double payment = Double.parseDouble(field_payment.getText());
+                double payment = Double.parseDouble(field_payment.getText().isBlank() ? "0" : field_payment.getText());
                 double totalAmount = Double.parseDouble(label_totalAmount.getText().substring(2));
                 if(!field_payment.getText().isBlank() && payment >= totalAmount)
                 {
@@ -460,6 +474,8 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         menuItem_itemDb = new javax.swing.JMenuItem();
         menuItem_salesClerkDb = new javax.swing.JMenuItem();
+        jSeparator10 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem5 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Point of Sale");
@@ -1022,6 +1038,16 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu3.add(menuItem_salesClerkDb);
+        jMenu3.add(jSeparator10);
+
+        jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ADD, java.awt.event.InputEvent.ALT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem5.setText("Add Stocks");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem5);
 
         jMenuBar1.add(jMenu3);
 
@@ -1042,7 +1068,7 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void button_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_addActionPerformed
-        openItemDialog();
+        openItemDialog(false);
     }//GEN-LAST:event_button_addActionPerformed
 
     private void button_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_deleteActionPerformed
@@ -1050,7 +1076,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_button_deleteActionPerformed
 
     private void menuItem_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_addActionPerformed
-        openItemDialog();
+        openItemDialog(false);
     }//GEN-LAST:event_menuItem_addActionPerformed
 
     private void menuItem_salesClerkDbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_salesClerkDbActionPerformed
@@ -1123,14 +1149,23 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         System.exit(0);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        openItemDialog(true);
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
     
-    private void openItemDialog()
-    {        
-        ItemDialog item = new ItemDialog(this, true);
-        int x = (getWidth() - item.getWidth()) / 2;
-        int y = (getHeight() - item.getHeight()) / 2;
-        item.setLocation(x,y);
-        item.setVisible(true);
+    private void openItemDialog(boolean stockMode)
+    {
+        MessageHandler mh = new MessageHandler();
+        if((stockMode && currentClerk.getFirstname().equals("admin")) || !stockMode)
+        {
+            ItemDialog item = new ItemDialog(this, true, stockMode);
+            int x = (getWidth() - item.getWidth()) / 2;
+            int y = (getHeight() - item.getHeight()) / 2;
+            item.setLocation(x,y);
+            item.setVisible(true);
+        }
+        else mh.warning("Non-admin are not allowed to use this function!");
     }
     private ImageIcon getScaledImageIcon(String imageName, int height, int width)
     {
@@ -1204,6 +1239,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1211,6 +1247,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JSeparator jSeparator4;

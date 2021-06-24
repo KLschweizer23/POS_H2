@@ -134,7 +134,7 @@ public class DatabaseFunctions
      * @param keyName Name of column and also to retrieve data on ResultSet
      * @return Returns a {@code HashMap<String, ArrayList>} with the data on ArrayList and key as {@code keyName}.
      */
-    public HashMap customQuery(String query, String[] keyName)
+    public HashMap customReturnQuery(String query, String[] keyName)
     {
         HashMap<String, ArrayList> map = new HashMap<>();
         try

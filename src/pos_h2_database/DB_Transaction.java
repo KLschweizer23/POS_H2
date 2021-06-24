@@ -71,7 +71,7 @@ public class DB_Transaction {
         String myQuery = "SELECT DISTINCT(" + T_ID + ") FROM " + table + " ORDER BY " + T_ID + " ASC ";
         String[] keys = {T_ID};
         
-        HashMap<String, ArrayList> data = df.customQuery(myQuery, keys);
+        HashMap<String, ArrayList> data = df.customReturnQuery(myQuery, keys);
         ArrayList<String> idList = data.get(T_ID);
         int availableValue = getAvailableValue(idList);
         return availableValue + "";
