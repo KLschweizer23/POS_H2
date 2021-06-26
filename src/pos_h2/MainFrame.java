@@ -773,11 +773,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         table_history.setFillsViewportHeight(true);
         table_history.setFocusable(false);
-<<<<<<< HEAD
         table_history.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table_history.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-=======
->>>>>>> refs/remotes/origin/master
         table_history.setShowVerticalLines(false);
         table_history.getTableHeader().setResizingAllowed(false);
         table_history.getTableHeader().setReorderingAllowed(false);
