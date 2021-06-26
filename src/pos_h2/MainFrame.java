@@ -7,21 +7,28 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
+import myUtilities.SystemUtilities;
 import pos_h2_database.Clerk;
 import pos_h2_database.DB_Item;
 import pos_h2_database.DB_Transaction;
@@ -33,7 +40,9 @@ public class MainFrame extends javax.swing.JFrame {
     static MainFrame myFrame;
     
     ArrayList<String> idList = new ArrayList();
+    
     HashMap<String, Item> item = new HashMap<>();
+    HashMap<String, Transaction> transactions = new HashMap<>();
     
     Clerk currentClerk;
     
@@ -44,6 +53,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         
+        getCurrentDateTime();
         createColumns();
         createColumns2();
         login();
@@ -77,7 +87,7 @@ public class MainFrame extends javax.swing.JFrame {
         for(int i = 0; dtm2.getRowCount() != 0;)
             dtm2.removeRow(i);
         DB_Transaction tDb = new DB_Transaction();
-        HashMap<String, Transaction> transactions = tDb.processData();
+        transactions = tDb.processData();
         ArrayList<String> idLists = tDb.getIdList();
         for(int i = idLists.size() - 1; i >= 0; i--)
         {
@@ -89,6 +99,7 @@ public class MainFrame extends javax.swing.JFrame {
             };
             dtm2.addRow(rowData);
         }
+        table_history.setRowHeight(20);
     }
     private double getTotalAmount(ArrayList<Item> item)
     {
@@ -186,6 +197,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void setup()
     {
+        //TABLES
         table_display.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -198,6 +210,36 @@ public class MainFrame extends javax.swing.JFrame {
                 int y = p.y / 30;
                 if(y < dtm.getRowCount())
                     table_display.setRowSelectionInterval(0, y);
+            }
+        });
+        
+        table_history.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                int y = p.y / 20;
+                if(y < dtm2.getRowCount())
+                    table_history.setRowSelectionInterval(0, y);
+            }
+        });
+        table_history.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent me)
+            {
+                if(SwingUtilities.isLeftMouseButton(me))
+                {
+                    String id = table_history.getValueAt(table_history.getSelectedRow(), 0).toString();
+                    TransactionDetailsDialog tDialog = new TransactionDetailsDialog(myFrame, true, transactions.get(id));
+                    int x = (getWidth() - tDialog.getWidth()) / 2;
+                    int y = (getHeight() - tDialog.getHeight()) / 2;
+                    tDialog.setLocation(x,y);
+                    tDialog.setVisible(true);
+                }
             }
         });
         //FONTS || TEXTS
@@ -231,23 +273,28 @@ public class MainFrame extends javax.swing.JFrame {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), property);
         
         getRootPane().registerKeyboardAction(e ->{
+            if (table_display.getRowCount() > 0)
             adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), 1);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), property);  
         
         getRootPane().registerKeyboardAction(e ->{
-            adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), 1);
+            if (table_display.getRowCount() > 0)
+                adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), 1);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, 0), property);
                 
         getRootPane().registerKeyboardAction(e ->{
-            adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), 1);
+            if (table_display.getRowCount() > 0)
+                adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), 1);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), property);
                 
         getRootPane().registerKeyboardAction(e ->{
-            adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), -1);
+            if (table_display.getRowCount() > 0)
+                adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), -1);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), property);
                 
         getRootPane().registerKeyboardAction(e ->{
-            adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), -1);
+            if (table_display.getRowCount() > 0)
+                adjustQuantityToBuy(item.get(table_display.getValueAt(table_display.getSelectedRow(), 0).toString()), -1);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), property);
         
         getRootPane().registerKeyboardAction(e ->{
@@ -269,6 +316,10 @@ public class MainFrame extends javax.swing.JFrame {
         getRootPane().registerKeyboardAction(e ->{
             openItemDialog(true);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ADD, KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), property);
+                
+        getRootPane().registerKeyboardAction(e ->{
+            confirmExit();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK), property);
     }
     private void controlTable(boolean goDown)
     {
@@ -297,21 +348,24 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void adjustQuantityToBuy(Item item, int amount)
     {
-        MessageHandler mh = new MessageHandler();
-        
-        int current = Integer.parseInt(item.getQuantityToBuy());
-        if(!(current == 1 && amount == -1))
+        if(table_display.getRowCount() > 0)
         {
-            int currentQuantity = Integer.parseInt(item.getQuantity());
-            if(current + amount > currentQuantity)
-                mh.warning("<html>There's not enough stocks for this item!<br>"
-                        + "Item: <b>" + item.getName() + "</b><br>"
-                                + "Quantity: <b>" + item.getQuantity() + "</b><br></html>");
-            else
-                item.setQuantityToBuy(current + amount + "");
+            MessageHandler mh = new MessageHandler();
+
+            int current = Integer.parseInt(item.getQuantityToBuy());
+            if(!(current == 1 && amount == -1))
+            {
+                int currentQuantity = Integer.parseInt(item.getQuantity());
+                if(current + amount > currentQuantity)
+                    mh.warning("<html>There's not enough stocks for this item!<br>"
+                            + "Item: <b>" + item.getName() + "</b><br>"
+                                    + "Quantity: <b>" + item.getQuantity() + "</b><br></html>");
+                else
+                    item.setQuantityToBuy(current + amount + "");
+            }
+            selectedRow = table_display.getSelectedRow();
+            processTable();
         }
-        selectedRow = table_display.getSelectedRow();
-        processTable();
     }
     
     public void addItem(Item item)
@@ -366,19 +420,24 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void checkBalance(Double totalAmount)
     {
-        double payment = Double.parseDouble(field_payment.getText().isBlank() ? "0" : field_payment.getText());
-        
-        if(payment >= totalAmount)
+        SystemUtilities su = new SystemUtilities();
+        boolean isANumber = su.isANumber(field_payment.getText());
+        if(isANumber || field_payment.getText().isBlank())
         {
-            jLabel16.setText(payment - totalAmount + "");
-            label_balance.setForeground(Color.green);
-            label_balance.setText((char)8369 + " 0.0");
-        }
-        else
-        {
-            jLabel16.setText(totalAmount - payment + "");
-            label_balance.setForeground(Color.red);
-            label_balance.setText((char)8369 + " " + (totalAmount - payment));
+            double payment = Double.parseDouble(field_payment.getText().isBlank() ? "0" : field_payment.getText());
+
+            if(payment >= totalAmount)
+            {
+                label_change.setText(payment - totalAmount + "");
+                label_balance.setForeground(Color.green);
+                label_balance.setText((char)8369 + " 0.0");
+            }
+            else
+            {
+                label_change.setText("");
+                label_balance.setForeground(Color.red);
+                label_balance.setText((char)8369 + " " + (totalAmount - payment));
+            }
         }
     }
     private Double getTotalAmount()
@@ -416,12 +475,17 @@ public class MainFrame extends javax.swing.JFrame {
 
                         transaction.setT_id(tId);
                         transaction.setT_clerk(currentClerk.getName());
-                        transaction.setDate(label_date.getText());
+                        transaction.setDate(getCurrentDateTime());
+                        transaction.setTotalAmount(totalAmount + "");
+                        transaction.setPayment(payment + "");
 
                         Item newItem = new Item();
                         ArrayList<Item> listOfItem = new ArrayList<>();
 
                         newItem.setId(item.get(id).getId());
+                        newItem.setName(item.get(id).getName());
+                        newItem.setArticle(item.get(id).getArticle());
+                        newItem.setBrand(item.get(id).getBrand());
                         newItem.setQuantity(item.get(id).getQuantityToBuy());
                         newItem.setPrice(item.get(id).getPrice());
 
@@ -439,6 +503,10 @@ public class MainFrame extends javax.swing.JFrame {
                 } else mh.warning("Invalid payment!");
             } else mh.warning("There are no items to buy!");
         } else mh.warning("There are no sales clerk!");
+    }
+    private String getCurrentDateTime()
+    {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     }
     private void updateQuantity(Item item)
     {
@@ -515,7 +583,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jSeparator7 = new javax.swing.JSeparator();
         jSeparator8 = new javax.swing.JSeparator();
-        jLabel16 = new javax.swing.JLabel();
+        label_change = new javax.swing.JLabel();
         jSeparator9 = new javax.swing.JSeparator();
         jLabel17 = new javax.swing.JLabel();
         field_payment = new javax.swing.JTextField();
@@ -628,7 +696,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap(912, Short.MAX_VALUE)
+                        .addContainerGap(908, Short.MAX_VALUE)
                         .addComponent(button_add, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -823,12 +891,11 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator8.setBackground(new java.awt.Color(255, 255, 255));
         jSeparator8.setForeground(new java.awt.Color(255, 255, 255));
 
-        jLabel16.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel16.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel16.setText("0.0");
-        jLabel16.setFocusable(false);
+        label_change.setBackground(new java.awt.Color(255, 255, 255));
+        label_change.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
+        label_change.setForeground(new java.awt.Color(255, 255, 255));
+        label_change.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label_change.setFocusable(false);
 
         jSeparator9.setBackground(new java.awt.Color(255, 255, 255));
         jSeparator9.setForeground(new java.awt.Color(255, 255, 255));
@@ -902,10 +969,11 @@ public class MainFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(label_balance)
-                                    .addComponent(field_payment, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel16)))
-                        .addGap(0, 48, Short.MAX_VALUE))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(field_payment, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(label_change)))))
+                        .addGap(0, 0, 0))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jSeparator9, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -926,7 +994,7 @@ public class MainFrame extends javax.swing.JFrame {
                                     .addComponent(label_totalItem)
                                     .addComponent(label_totalAmount)
                                     .addComponent(label_salesClerk))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                                .addGap(0, 94, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -982,7 +1050,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel12)
                     .addComponent(jLabel13)
                     .addComponent(jLabel23)
-                    .addComponent(jLabel16)
+                    .addComponent(label_change)
                     .addComponent(field_payment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1210,9 +1278,17 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        System.exit(0);
+        confirmExit();
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
+    private void confirmExit()
+    {
+        MessageHandler mh = new MessageHandler();
+        int choice = mh.confirm("System is closing...");
+        if(choice == JOptionPane.OK_OPTION)
+            System.exit(0);
+    }
+    
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
         openItemDialog(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
@@ -1228,7 +1304,7 @@ public class MainFrame extends javax.swing.JFrame {
             item.setLocation(x,y);
             item.setVisible(true);
         }
-        else mh.warning("Non-admin are not allowed to use this function!");
+        else mh.warning("Non-admin are not authorized with this function!");
     }
     private ImageIcon getScaledImageIcon(String imageName, int height, int width)
     {
@@ -1283,7 +1359,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel23;
@@ -1319,6 +1394,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSeparator jSeparator9;
     private javax.swing.JLabel label_balance;
+    private javax.swing.JLabel label_change;
     private javax.swing.JLabel label_date;
     private javax.swing.JLabel label_salesClerk;
     private javax.swing.JLabel label_totalAmount;

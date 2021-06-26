@@ -1,5 +1,8 @@
 package pos_h2;
 
+import java.awt.event.KeyEvent;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import myUtilities.MessageHandler;
 import pos_h2_database.*;
 
@@ -12,6 +15,21 @@ public class LoginForm extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         main = parent;
+        
+        commands();
+    }
+    
+    private void commands()
+    {
+        int property = JComponent.WHEN_IN_FOCUSED_WINDOW;
+        
+        getRootPane().registerKeyboardAction(e -> {
+            System.exit(0);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), property);
+        
+        getRootPane().registerKeyboardAction(e -> {
+            login();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), property);
     }
 
     /**
@@ -82,7 +100,7 @@ public class LoginForm extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(field_username, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(44, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -122,6 +140,11 @@ public class LoginForm extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
    
     private void button_loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_loginActionPerformed
+        login();
+    }//GEN-LAST:event_button_loginActionPerformed
+    
+    private void login()
+    {
         DB_Clerk clerkDb = new DB_Clerk();
         Clerk clerk = clerkDb.checkPassword(field_username.getText(), field_password.getPassword());
         
@@ -148,8 +171,8 @@ public class LoginForm extends javax.swing.JDialog {
             dispose();
         }
         else mh.error("Credentials not found!");
-    }//GEN-LAST:event_button_loginActionPerformed
-
+    }
+    
     private void button_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_exitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_button_exitActionPerformed

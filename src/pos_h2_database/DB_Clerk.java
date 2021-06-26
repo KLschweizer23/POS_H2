@@ -34,7 +34,7 @@ public class DB_Clerk {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, FIRSTNAME);
+        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, FIRSTNAME, true);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
         {
             Clerk clerkObject = new Clerk();
@@ -122,21 +122,21 @@ public class DB_Clerk {
     public Clerk checkPassword(String user, char[] password)
     {
         processData("", 0);
-        boolean accountExist = true;
+        boolean accountExist = false;
         String id = "";
-        for(int i = 0; i < clerk.size(); i++)
+        for(int i = 0; i < clerk.size() && !accountExist; i++)
         {
             accountExist = true;
             id = idList.get(i);
             if(clerk.get(id).getPassword().length() == password.length && clerk.get(id).getUser().equals(user))
                 for(int j = 0; j < password.length; j++)
+                {
                     if(password[j] != clerk.get(idList.get(i)).getPassword().charAt(j))
                     {
                         System.out.println(password[j] + " != " + clerk.get(idList.get(i)).getPassword().charAt(j));
                         accountExist = false;
                     }
-                    else
-                        ;
+                }
             else
                 accountExist = false;
         }

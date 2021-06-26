@@ -7,7 +7,11 @@ public class Transaction {
     private String t_id;
     private String t_clerk;
     private String date;
+    
     private ArrayList<Item> item; 
+    
+    private String totalAmount;
+    private String payment;
 
     public String getId() {
         return id;
@@ -47,5 +51,21 @@ public class Transaction {
 
     public void setItem(ArrayList<Item> item) {
         this.item = item;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getPayment() {
+        return payment;
+    }
+
+    public void setPayment(String payment) {
+        this.payment = payment;
     }
 }

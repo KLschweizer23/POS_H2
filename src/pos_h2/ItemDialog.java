@@ -85,7 +85,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 item.get(id).getArticle(),
                 item.get(id).getBrand(),
                 item.get(id).getQuantity(),
-                item.get(id).getPrice()
+                (char)8369 + " " + item.get(id).getPrice()
             };
             dtm.addRow(rowData);
         }

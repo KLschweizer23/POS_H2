@@ -10,7 +10,10 @@ import java.util.ArrayList;
 
 /**
  * The DatabaseFunctions Class is to help creating small SQL Codes
- * divided into functions. 
+ * divided into functions.<br> 
+ * This class utilizes {@code HashMap<K, V>} for easier retrieval of data with the given keys.<br>
+ * Keys can be columns, which is also use to retrieve data for {@code ResultSet} data.
+ * 
  * <br><br>
  * <b>NOTE:</b> Create your Schema First.
  * <br><br>
@@ -115,12 +118,14 @@ public class DatabaseFunctions
      * @param filterKey String to filter retrieving data. "" If none.
      * @param columnIndexFilter Index of {@code column} to get column to filter data.
      * @param orderBy Orders the Data with the given column name.
+     * @param isAscending If {@code true} sorts data in ascending order, descending if {@code false}.
      * @return Returns a HashMap with keys as your column and values as ArrayList of data in columns.
      */
-    public HashMap selectAllData(String table, String[] column, String filterKey, int columnIndexFilter, String orderBy)
+    public HashMap selectAllData(String table, String[] column, String filterKey, int columnIndexFilter, String orderBy, boolean isAscending)
     {
         HashMap<String, ArrayList> map = new HashMap();
-        String query = "SELECT * FROM " + table + " WHERE " + column[columnIndexFilter] + " LIKE '%" + goodString(filterKey) + "%' ORDER BY " + orderBy;
+        String ascOrDesc = isAscending ? "ASC" : "DESC";
+        String query = "SELECT * FROM " + table + " WHERE " + column[columnIndexFilter] + " LIKE '%" + goodString(filterKey) + "%' ORDER BY " + orderBy + " " + ascOrDesc;
         try
         {
             map = executeReturnQuery(query, column);

@@ -53,14 +53,14 @@ public class ItemDb extends javax.swing.JDialog {
         //COMMANDS
 
     }
-    private void processTable()
+    private void processTable(String keyword, int col)
     {
         DB_Item itemDb = new DB_Item();
         
         clearTable();
         
         idList = itemDb.getIdList();
-        item = itemDb.processData("", 0);
+        item = itemDb.processData(keyword, col);
         
         for(int i = 0; i < item.size(); i++)
         {
@@ -211,6 +211,12 @@ public class ItemDb extends javax.swing.JDialog {
             }
         });
 
+        field_item.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                field_itemKeyReleased(evt);
+            }
+        });
+
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Article");
         jLabel2.setFocusable(false);
@@ -224,7 +230,6 @@ public class ItemDb extends javax.swing.JDialog {
         jLabel4.setFocusable(false);
 
         field_quantity.setText("0");
-        field_quantity.setEnabled(false);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setText("Price");
@@ -348,7 +353,7 @@ public class ItemDb extends javax.swing.JDialog {
             Item item = getItem();
             
             itemDb.insertData(item);
-            processTable();
+            processTable("", 0);
             emptyFields();
         } else mh.warning("Please fill the fields properly!");
     }//GEN-LAST:event_button_addActionPerformed
@@ -372,7 +377,7 @@ public class ItemDb extends javax.swing.JDialog {
             Item item = getItem();
             item.setId(label_id.getText());
             itemDb.updateData(item);
-            processTable();
+            processTable("", 0);
             emptyFields();
         } else mh.warning("Please fill the fields properly!");
     }//GEN-LAST:event_button_updateActionPerformed
@@ -380,6 +385,11 @@ public class ItemDb extends javax.swing.JDialog {
     private void button_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_deleteActionPerformed
         deleteData();
     }//GEN-LAST:event_button_deleteActionPerformed
+
+    private void field_itemKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_field_itemKeyReleased
+        String keyword = field_item.getText();
+        processTable(keyword, 1);
+    }//GEN-LAST:event_field_itemKeyReleased
     private void deleteData()
     {
         DB_Item itemDb = new DB_Item();
@@ -387,7 +397,7 @@ public class ItemDb extends javax.swing.JDialog {
         Item item = getItem();
         item.setId(label_id.getText());
         itemDb.deleteData(item);
-        processTable();
+        processTable("", 0);
         emptyFields();
     }
     private void emptyFields()
@@ -518,7 +528,7 @@ public class ItemDb extends javax.swing.JDialog {
         initComponents();
         
         createColumns();
-        processTable();
+        processTable("", 0);
         setupTable();
         setup();
     }

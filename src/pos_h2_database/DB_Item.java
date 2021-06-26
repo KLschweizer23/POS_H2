@@ -33,7 +33,7 @@ public class DB_Item {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, NAME);
+        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, NAME, true);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
         {
             Item itemObject = new Item();
