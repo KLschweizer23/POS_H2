@@ -1,5 +1,8 @@
 package myUtilities;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Just to make some functions centralized and easy to call.
  * 
@@ -7,7 +10,7 @@ package myUtilities;
  */
 public class SystemUtilities 
 {
-    
+    //----------------------------STRING FUNCTIONS-------------------------\\
     /**
      * Checks whether a String can be a number.
      * 
@@ -38,5 +41,16 @@ public class SystemUtilities
             valid = false; 
         } 
         return valid;
+    }
+    
+    //----------------------------TIME FUNCTIONS-------------------------\\
+    /**
+     * Gets Current Local Time
+     * 
+     * @return Returns current local time in "{@code yyyy-MM-dd HH:mm:ss.SSS}" format.
+     */
+    public String getCurrentDateTime()
+    {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     }
 }

@@ -10,13 +10,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
@@ -31,9 +28,11 @@ import myUtilities.MessageHandler;
 import myUtilities.SystemUtilities;
 import pos_h2_database.Clerk;
 import pos_h2_database.DB_Item;
+import pos_h2_database.DB_Login;
 import pos_h2_database.DB_Transaction;
 
 import pos_h2_database.Item;
+import pos_h2_database.Log;
 import pos_h2_database.Transaction;
 
 public class MainFrame extends javax.swing.JFrame {
@@ -45,6 +44,7 @@ public class MainFrame extends javax.swing.JFrame {
     HashMap<String, Transaction> transactions = new HashMap<>();
     
     Clerk currentClerk;
+    Log currentLog;
     
     DefaultTableModel dtm, dtm2;
     
@@ -53,7 +53,6 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         
-        getCurrentDateTime();
         createColumns();
         createColumns2();
         login();
@@ -463,6 +462,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if(!field_payment.getText().isBlank() && payment >= totalAmount)
                 {
                     DB_Transaction tDb = new DB_Transaction();
+                    SystemUtilities su = new SystemUtilities();
                     String tId = tDb.getAvailableTID();
                     
                     for(int i = 0; i < item.size(); i++)
@@ -475,7 +475,7 @@ public class MainFrame extends javax.swing.JFrame {
 
                         transaction.setT_id(tId);
                         transaction.setT_clerk(currentClerk.getName());
-                        transaction.setDate(getCurrentDateTime());
+                        transaction.setDate(su.getCurrentDateTime());
                         transaction.setTotalAmount(totalAmount + "");
                         transaction.setPayment(payment + "");
 
@@ -503,10 +503,6 @@ public class MainFrame extends javax.swing.JFrame {
                 } else mh.warning("Invalid payment!");
             } else mh.warning("There are no items to buy!");
         } else mh.warning("There are no sales clerk!");
-    }
-    private String getCurrentDateTime()
-    {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     }
     private void updateQuantity(Item item)
     {
@@ -604,6 +600,10 @@ public class MainFrame extends javax.swing.JFrame {
         menuItem_salesClerkDb = new javax.swing.JMenuItem();
         jSeparator10 = new javax.swing.JPopupMenu.Separator();
         jMenuItem5 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        menuItem_transactions = new javax.swing.JMenuItem();
+        menuItem_sales = new javax.swing.JMenuItem();
+        menuItem_log = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Point of Sale");
@@ -1182,6 +1182,24 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(menu_database);
 
+        jMenu3.setText("Others");
+
+        menuItem_transactions.setText("Transactions");
+        jMenu3.add(menuItem_transactions);
+
+        menuItem_sales.setText("Sales");
+        jMenu3.add(menuItem_sales);
+
+        menuItem_log.setText("Log Record");
+        menuItem_log.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_logActionPerformed(evt);
+            }
+        });
+        jMenu3.add(menuItem_log);
+
+        jMenuBar1.add(jMenu3);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1269,6 +1287,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        recordLogout();
         currentClerk = null;
         dispose();
         myFrame = new MainFrame();
@@ -1277,6 +1296,19 @@ public class MainFrame extends javax.swing.JFrame {
         myFrame.setMaximumSize(myFrame.getSize());
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
+    private void recordLogout()
+    {
+        DB_Login logDb = new DB_Login();
+        SystemUtilities su = new SystemUtilities();
+        
+        Log log = new Log();
+        log.setSalesClerk(currentClerk.getName());
+        log.setStatus("OUT");
+        log.setTimeOut(su.getCurrentDateTime());
+        
+        logDb.insertData(log);
+    }
+    
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         confirmExit();
     }//GEN-LAST:event_jMenuItem4ActionPerformed
@@ -1292,6 +1324,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
         openItemDialog(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void menuItem_logActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_logActionPerformed
+        
+    }//GEN-LAST:event_menuItem_logActionPerformed
     
     private void openItemDialog(boolean stockMode)
     {
@@ -1371,6 +1407,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -1402,8 +1439,11 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem_add;
     private javax.swing.JMenuItem menuItem_findPrice;
     private javax.swing.JMenuItem menuItem_itemDb;
+    private javax.swing.JMenuItem menuItem_log;
     private javax.swing.JMenuItem menuItem_remove;
+    private javax.swing.JMenuItem menuItem_sales;
     private javax.swing.JMenuItem menuItem_salesClerkDb;
+    private javax.swing.JMenuItem menuItem_transactions;
     private javax.swing.JMenu menu_database;
     private javax.swing.JTable table_display;
     private javax.swing.JTable table_history;

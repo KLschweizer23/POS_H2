@@ -1,9 +1,12 @@
 package pos_h2;
 
 import java.awt.event.KeyEvent;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import myUtilities.MessageHandler;
+import myUtilities.SystemUtilities;
 import pos_h2_database.*;
 
 public class LoginForm extends javax.swing.JDialog {
@@ -158,21 +161,35 @@ public class LoginForm extends javax.swing.JDialog {
             clerk.setId("admin");
             clerk.setName("admin");
             clerk.setFirstname("admin");
-            clerk.setMiddlename("admin");
+            clerk.setMiddlename("admin"); 
             clerk.setLastname("admin");
             main.setCurrentClerk(clerk);
+            recordLogin(clerk);
             mh.message("Admin successfully logged in!");
             dispose();
         } 
         else if(clerk != null)
         {
             main.setCurrentClerk(clerk);
+            recordLogin(clerk);
             mh.message("You have successfully logged in!");
             dispose();
         }
         else mh.error("Credentials not found!");
+        
     }
-    
+    private void recordLogin(Clerk clerk)
+    {
+        DB_Login logDb = new DB_Login();
+        SystemUtilities su = new SystemUtilities();
+        
+        Log log = new Log();
+        log.setSalesClerk(clerk.getName());
+        log.setStatus("IN");
+        log.setTimeIn(su.getCurrentDateTime());
+        
+        logDb.insertData(log);
+    }
     private void button_exitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_exitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_button_exitActionPerformed

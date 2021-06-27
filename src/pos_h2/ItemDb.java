@@ -2,18 +2,12 @@ package pos_h2;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
 import pos_h2_database.DB_Item;
@@ -24,7 +18,7 @@ public class ItemDb extends javax.swing.JDialog {
     MessageHandler mh = new MessageHandler();
     
     
-    private int rowHeight = 30;
+    private final int rowHeight = 30;
      
     private ArrayList<String> idList = new ArrayList<>();
     private HashMap<String, Item> item = new HashMap<>();
@@ -35,6 +29,7 @@ public class ItemDb extends javax.swing.JDialog {
     {
         dtm = new DefaultTableModel(0,0)
         {
+            @Override
             public boolean isCellEditable(int row, int column)
             {
                 return false;
