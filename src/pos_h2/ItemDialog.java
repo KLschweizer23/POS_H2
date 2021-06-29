@@ -9,6 +9,8 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -24,12 +26,13 @@ public class ItemDialog extends javax.swing.JDialog {
     private DefaultTableModel dtm;
     private DefaultTableModel dtm2;
     
+    JFrame frame;
+    JDialog dialog;
+    
     final private int rowHeight = 30;
     private int selectedRow = 0;
     
     private boolean stockMode = false;
-    
-    MainFrame main;
     
     private void createColumns()
     {
@@ -200,17 +203,19 @@ public class ItemDialog extends javax.swing.JDialog {
         {
             Item itemObj = item.get(itemTable.getValueAt(itemTable.getSelectedRow(), 0).toString());
 
-            if(!stockMode)
+            if(!stockMode && dialog == null)
             {
                 if(!itemObj.getQuantity().equals("0"))
                 {
+                    MainFrame main = (MainFrame)frame;
                     main.addItem(itemObj);
                     dispose();
                 } else mh.warning("There's not enough stocks for this item!");
             }
-            else
+            else if(stockMode && dialog == null)
             {
-                String quantity = inputUser();
+                SystemUtilities su = new SystemUtilities();
+                String quantity = su.inputNumberUser();
                 if(quantity != null)
                 {
                     String[] rowData = {itemObj.getId(), itemObj.getName(), quantity};
@@ -221,30 +226,15 @@ public class ItemDialog extends javax.swing.JDialog {
                     displayTable.setRowHeight(20);
                 }
             }
-        }
-    }
-    
-    private String inputUser()
-    {            
-        MessageHandler mh = new MessageHandler();
-        
-        String quantity;
-        boolean pass;
-        do
-        {
-            quantity = mh.input("Enter quantity to add");
-            if(quantity == null)
-                pass = true;
-            else
+            else if(!stockMode && dialog != null)
             {
-                SystemUtilities su = new SystemUtilities();
-                pass = su.isANumber(quantity);
-                if(pass)
-                    return quantity;
+                if(!itemObj.getQuantity().equals("0"))
+                {
+                    InvoiceDialog invoiceDialog = (InvoiceDialog)dialog;
+                    
+                }
             }
-        }while(!pass);
-        
-        return quantity;
+        }
     }
     
     /**
@@ -440,13 +430,15 @@ public class ItemDialog extends javax.swing.JDialog {
             dispose();
         }
     }//GEN-LAST:event_button_confirmActionPerformed
-    public ItemDialog(MainFrame parent, boolean modal, boolean stockMode) {
+    public ItemDialog(JFrame parent, JDialog secondParent, boolean modal, boolean stockMode) {
         super(parent, modal);
         initComponents();
         
-        main = parent;
+        dialog = secondParent;
+        frame = parent;
+        
         this.stockMode = stockMode;
-        if(!this.stockMode)
+        if(!this.stockMode || dialog != null)
         {
             jPanel1.remove(panel_display);
             revalidate();

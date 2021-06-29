@@ -30,4 +30,8 @@ public class MyConnection
         return con;
     }
     
+    public String getSchemaName()
+    {
+        return schemaName;
+    }
 }

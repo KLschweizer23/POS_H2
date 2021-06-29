@@ -113,7 +113,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void loginForm()
     {
-        LoginForm login = new LoginForm(this, true);
+        LoginFormDialog login = new LoginFormDialog(this, true);
         int x = (getWidth() - login.getWidth()) / 2;
         int y = (getHeight() - login.getHeight()) / 2;
         login.setLocation(x,y);
@@ -196,6 +196,14 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void setup()
     {
+        JFrame frame = this;
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                confirmExit();
+            }
+        });
+        
         //TABLES
         table_display.addMouseMotionListener(new MouseMotionListener() {
             @Override
@@ -540,6 +548,7 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuItem7 = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -601,11 +610,14 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator10 = new javax.swing.JPopupMenu.Separator();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
+        menuItem_invoice = new javax.swing.JMenuItem();
         menuItem_transactions = new javax.swing.JMenuItem();
         menuItem_sales = new javax.swing.JMenuItem();
         menuItem_log = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jMenuItem7.setText("jMenuItem7");
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Point of Sale");
         setResizable(false);
         addWindowFocusListener(new java.awt.event.WindowFocusListener() {
@@ -972,8 +984,7 @@ public class MainFrame extends javax.swing.JFrame {
                                     .addGroup(jPanel5Layout.createSequentialGroup()
                                         .addComponent(field_payment, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(label_change)))))
-                        .addGap(0, 0, 0))
+                                        .addComponent(label_change))))))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jSeparator9, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1183,6 +1194,15 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuBar1.add(menu_database);
 
         jMenu3.setText("Others");
+        jMenu3.setEnabled(false);
+
+        menuItem_invoice.setText("Invoice");
+        menuItem_invoice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_invoiceActionPerformed(evt);
+            }
+        });
+        jMenu3.add(menuItem_invoice);
 
         menuItem_transactions.setText("Transactions");
         jMenu3.add(menuItem_transactions);
@@ -1237,7 +1257,7 @@ public class MainFrame extends javax.swing.JFrame {
         MessageHandler mh = new MessageHandler();
         if(currentClerk.getFirstname().equals("admin"))
         {
-            ClerkDb clerkDb = new ClerkDb(this, true);
+            ClerkDbDialog clerkDb = new ClerkDbDialog(this, true);
             int x = (getWidth() - clerkDb.getWidth()) / 2;
             int y = (getHeight() - clerkDb.getHeight()) / 2;
             clerkDb.setLocation(x,y);
@@ -1254,7 +1274,7 @@ public class MainFrame extends javax.swing.JFrame {
         MessageHandler mh = new MessageHandler();
         if(currentClerk.getFirstname().equals("admin"))
         {
-            ItemDb itemDb = new ItemDb(this, true);
+            ItemDbDialog itemDb = new ItemDbDialog(this, true);
             int x = (getWidth() - itemDb.getWidth()) / 2;
             int y = (getHeight() - itemDb.getHeight()) / 2;
             itemDb.setLocation(x,y);
@@ -1318,7 +1338,10 @@ public class MainFrame extends javax.swing.JFrame {
         MessageHandler mh = new MessageHandler();
         int choice = mh.confirm("System is closing...");
         if(choice == JOptionPane.OK_OPTION)
+        {
+            recordLogout();
             System.exit(0);
+        }
     }
     
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
@@ -1326,15 +1349,35 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void menuItem_logActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_logActionPerformed
-        
+        openLogDialog();
     }//GEN-LAST:event_menuItem_logActionPerformed
+
+    private void menuItem_invoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_invoiceActionPerformed
+        openInvoiceDialog();
+    }//GEN-LAST:event_menuItem_invoiceActionPerformed
     
+    private void openInvoiceDialog()
+    {
+        InvoiceDialog invoice = new InvoiceDialog(this, true);
+        int x = (getWidth() - invoice.getWidth()) / 2;
+        int y = (getHeight() - invoice.getHeight()) / 2;
+        invoice.setLocation(x,y);
+        invoice.setVisible(true);
+    }
+    private void openLogDialog()
+    {
+        LogDialog log = new LogDialog(this, true);
+        int x = (getWidth() - log.getWidth()) / 2;
+        int y = (getHeight() - log.getHeight()) / 2;
+        log.setLocation(x,y);
+        log.setVisible(true);
+    }
     private void openItemDialog(boolean stockMode)
     {
         MessageHandler mh = new MessageHandler();
         if((stockMode && currentClerk.getFirstname().equals("admin")) || !stockMode)
         {
-            ItemDialog item = new ItemDialog(this, true, stockMode);
+            ItemDialog item = new ItemDialog(this, null, true, stockMode);
             int x = (getWidth() - item.getWidth()) / 2;
             int y = (getHeight() - item.getHeight()) / 2;
             item.setLocation(x,y);
@@ -1414,6 +1457,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1438,6 +1482,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel label_totalItem;
     private javax.swing.JMenuItem menuItem_add;
     private javax.swing.JMenuItem menuItem_findPrice;
+    private javax.swing.JMenuItem menuItem_invoice;
     private javax.swing.JMenuItem menuItem_itemDb;
     private javax.swing.JMenuItem menuItem_log;
     private javax.swing.JMenuItem menuItem_remove;

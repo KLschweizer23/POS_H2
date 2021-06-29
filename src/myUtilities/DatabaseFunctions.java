@@ -34,13 +34,13 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param tableName Name for table to create eg. <i>SampleTable</i>.
-     * @param columnAndAttr Columns with their Attributes in an array String format.<br>
-     * <i>e.g.</i><br>
-     * array[0] = "ID INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY"<br>
-     * array[1] = "NAME VARCHAR(150) NOT NULL"<br>
-     * ...<br>
-     * array[nth] = "..."<br>
+     * @param   tableName           Name for table to create eg. <i>SampleTable</i>.
+     * @param   columnAndAttr       Columns with their Attributes in an array String format.<br>
+     *                              <i>e.g.</i><br>
+     *                              array[0] = "ID INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY"<br>
+     *                              array[1] = "NAME VARCHAR(150) NOT NULL"<br>
+     *                              ...<br>
+     *                              array[nth] = "..."<br>
      */
     public void createTable(String tableName, String[] columnAndAttr)
     {
@@ -53,9 +53,22 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param tableName Name of the table to insert.
-     * @param column Name of Columns of the table in an array String format.
-     * @param data Data to insert in table in an array String format.
+     * @param   tableName           Name of table to Drop.
+     */
+    public void dropTable(String tableName)
+    {
+        String drop = "DROP TABLE " + tableName;
+        try
+        {
+            executeQuery(drop);
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error deleting the table " + tableName + "!", sqlE.toString()));}
+    }
+    
+    /**
+     * 
+     * @param   tableName           Name of the table to insert.
+     * @param   column              Name of Columns of the table in an array String format.
+     * @param   data                Data to insert in table in an array String format.
      */
     public void insertData(String tableName, String[] column, String[] data)
     {
@@ -72,12 +85,12 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param tableName Name of the table to update.
-     * @param column Name of Columns of the table in an array String format.
-     * @param data Data to update in table in an array String format.
-     * <br><b>NOTE:</b><br>
-     * Include ID at the very first item of both array and will be use as basis of the WHERE condition:<br>
-     * {@code " WHERE " + column[0] + " = " + data[0]}
+     * @param   tableName           Name of the table to update.
+     * @param   column              Name of Columns of the table in an array String format.
+     * @param   data                Data to update in table in an array String format.
+     *                              <br><b>NOTE:</b><br>
+     *                              Include ID at the very first item of both array and will be use as basis of the WHERE condition:<br>
+     *                              {@code " WHERE " + column[0] + " = " + data[0]}
      */
     public void updateData(String tableName, String[] column, String[] data)
     {
@@ -96,9 +109,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param tableName Name of the table to delete data.
-     * @param column Name of Column of the table for condition.
-     * @param data data to be deleted that is on the column on {@code column}.
+     * @param   tableName           Name of the table to delete data.
+     * @param   column              Name of Column of the table for condition.
+     * @param   data                data to be deleted that is on the column on {@code column}.
      */
     public void deleteData(String tableName, String column, String data)
     {
@@ -113,13 +126,13 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param table Table to retrieve Data.
-     * @param column Columns of Table to retrieve Data.
-     * @param filterKey String to filter retrieving data. "" If none.
-     * @param columnIndexFilter Index of {@code column} to get column to filter data.
-     * @param orderBy Orders the Data with the given column name.
-     * @param isAscending If {@code true} sorts data in ascending order, descending if {@code false}.
-     * @return Returns a HashMap with keys as your column and values as ArrayList of data in columns.
+     * @param   table               Table to retrieve Data.
+     * @param   column              Columns of Table to retrieve Data.
+     * @param   filterKey           String to filter retrieving data. "" If none.
+     * @param   columnIndexFilter   Index of {@code column} to get column to filter data.
+     * @param   orderBy             Orders the Data with the given column name.
+     * @param   isAscending         If {@code true} sorts data in ascending order, descending if {@code false}.
+     * @return                      Returns a HashMap with keys as your column and values as ArrayList of data in columns.
      */
     public HashMap selectAllData(String table, String[] column, String filterKey, int columnIndexFilter, String orderBy, boolean isAscending)
     {
@@ -135,9 +148,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param query Your query to execute.
-     * @param keyName Name of column and also to retrieve data on ResultSet
-     * @return Returns a {@code HashMap<String, ArrayList>} with the data on ArrayList and key as {@code keyName}.
+     * @param   query               Your query to execute.
+     * @param   keyName             Name of column and also to retrieve data on ResultSet
+     * @return                      Returns a {@code HashMap<String, ArrayList>} with the data on ArrayList and key as {@code keyName}.
      */
     public HashMap customReturnQuery(String query, String[] keyName)
     {
@@ -152,8 +165,8 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param query Query to execute.
-     * @throws SQLException Throws the Origin of Exception.
+     * @param   query               Query to execute.
+     * @throws                      SQLException Throws the Origin of Exception.
      */
     public void executeQuery(String query) throws SQLException
     {
@@ -166,12 +179,12 @@ public class DatabaseFunctions
     /**
      * executeReturnQuery concept is to return a list of data of every columns received.
      * 
-     * @param query Query to execute.
-     * @param column column should be same to Column Names 
+     * @param   query               Query to execute.
+     * @param   column              column should be same to Column Names 
      * 
-     * @return Returns HashMap with your keys(column) and values as ArrrayList
+     * @return                      Returns HashMap with your keys(column) and values as ArrrayList
      * 
-     * @throws SQLException Throws the Origin of Exception.
+     * @throws                      SQLException Throws the Origin of Exception.
      */
     public HashMap executeReturnQuery(String query, String[] column) throws SQLException
     {
@@ -194,10 +207,10 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param result ResultSet from database to perform operation.
-     * @param keys Get Column Names to retrieve in database.
-     * @return Returns an array of ArrayList of the data.
-     * @throws SQLException 
+     * @param   result              ResultSet from database to perform operation.
+     * @param   keys                Get Column Names to retrieve in database.
+     * @return                      Returns an array of ArrayList of the data.
+     * @throws                      SQLException 
      */
     private ArrayList[] returnKeyLists(ResultSet result, String[] keys) throws SQLException
     {
@@ -227,15 +240,15 @@ public class DatabaseFunctions
 
     /**
      * 
-     * @param array The String in array format to process.
-     * @param removeFirstItem either removes the first item or not.<br>
-     * {@code TRUE} - Removes the first item in array.<br>
-     * {@code FALSE} - Does not remove the first item in array.
-     * @param isData Surrounds ' if {@code array} is a data.
-     * @param isBadString Whether Data is safe for sql query or not.
-     * {@code TRUE} - Adds a escape sequence for apostrophes. <br>
-     * {@code FALSE} - Original Data.
-     * @return Returns a single string of the given array.
+     * @param   array               The String in array format to process.
+     * @param   removeFirstItem     either removes the first item or not.<br>
+     *                              {@code TRUE} - Removes the first item in array.<br>
+     *                              {@code FALSE} - Does not remove the first item in array.
+     * @param   isData              Surrounds ' if {@code array} is a data.
+     * @param   isBadString         Whether Data is safe for sql query or not.
+     *                              {@code TRUE} - Adds a escape sequence for apostrophes. <br>
+     *                              {@code FALSE} - Original Data.
+     * @return                      Returns a single string of the given array.
      */
     private String arrayToString(String[] array, boolean removeFirstItem, boolean isData, boolean isBadString)
     {
@@ -256,9 +269,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Column of table for reference.
-     * @param data Data to be updated
-     * @return Returns a single String for SET in updating a table.
+     * @param   column              Column of table for reference.
+     * @param   data                Data to be updated
+     * @return                      Returns a single String for SET in updating a table.
      */
     private String arrayToStringSetter (String[] column, String[] data)
     {
@@ -274,8 +287,8 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param data Data to process.
-     * @return Returns a String for safety SQL Execution.
+     * @param   data                Data to process.
+     * @return                      Returns a String for safety SQL Execution.
      */
     private String goodString(String data)
     {
@@ -290,18 +303,28 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param data Data for the LIKE clause
-     * @return Returns a LIKE clause
+     * @param   data                Data for the LIKE clause
+     * @return                      Returns a LIKE clause
      */
-    public String likeEquals (String data)
+    public String like (String data)
     {
-        return " LIKE %" + goodString(data) + "%";
+        return " LIKE '%" + goodString(data) + "%'";
+    }
+    
+    
+    /**
+     * 
+     * @return                      Returns a WHERE clause
+     */
+    public String where()
+    {
+        return " WHERE ";
     }
     
     /**
      * 
-     * @param column Column for WHERE clause
-     * @return Returns a WHERE clause
+     * @param   column              Column for WHERE clause
+     * @return                      Returns a WHERE clause
      */
     public String where(String column)
     {
@@ -310,9 +333,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Column from table for the condition.
-     * @param data Data to be used for the condition.
-     * @return Returns a string for where equal condition
+     * @param   column              Column from table for the condition.
+     * @param   data                Data to be used for the condition.
+     * @return                      Returns a string for where equal condition
      */
     public String whereEquals (String column, String data)
     {
@@ -321,9 +344,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Column from table for the condition.
-     * @param data Data to be used for the condition.
-     * @return Returns a string for where not equal condition
+     * @param   column              Column from table for the condition.
+     * @param   data                Data to be used for the condition.
+     * @return                      Returns a string for where not equal condition
      */
     public String whereNotEquals (String column, String data)
     {
@@ -332,9 +355,18 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Column from table for the condition.
-     * @param data Data to be used for the condition.
-     * @return Returns a string for and equal condition
+     * @return                      Returns a string for {@code AND} condition.
+     */
+    public String and ()
+    {
+        return "AND ";
+    }    
+    
+    /**
+     * 
+     * @param   column              Column from table for the condition.
+     * @param   data                Data to be used for the condition.
+     * @return                      Returns a string for and equal condition
      */
     public String andEquals (String column, String data)
     {
@@ -343,9 +375,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Column from table for the condition.
-     * @param data Data to be used for the condition.
-     * @return Returns a string for and not equal condition
+     * @param   column              Column from table for the condition.
+     * @param   data                Data to be used for the condition.
+     * @return                      Returns a string for and not equal condition
      */
     public String andNotEquals (String column, String data)
     {
@@ -354,8 +386,8 @@ public class DatabaseFunctions
   
     /**
      * 
-     * @param keys Columns you want to select in a String array format.
-     * @return Returns a string for execution.
+     * @param   keys                Columns you want to select in a String array format.
+     * @return                      Returns a string for execution.
      */
     public String select(String[] keys)
     {
@@ -364,7 +396,21 @@ public class DatabaseFunctions
     
     /**
      * 
+     * @param   schemaName          Name of Schema to get tables.
+     * @param   alias               Name or Alias for the column.
+     *                              <br><br>
+     *                              <b>NOTE:</b> Add an {@code AND} condition to filter tables.
+     *                              <br><br>
      * @return Returns a string for execution.
+     */
+    public String getTables(String schemaName, String alias)
+    {
+        return "SELECT TABLE_NAME AS '" + alias + "' FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" + schemaName + "' ";
+    }
+    
+    /**
+     * 
+     * @return                      Returns a string for execution.
      */
     public String selectAll()
     {
@@ -373,9 +419,9 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param selectString
-     * @param asName
-     * @return 
+     * @param   selectString        Table to select.
+     * @param   asName              Alias of the column.
+     * @return                      Return as a String.
      */
     public String selectSingleAs(String selectString, String asName)
     {
@@ -384,8 +430,8 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param tableName Table to select.
-     * @return Returns a string for execution.
+     * @param   tableName           Table to select.
+     * @return                      Returns a string for execution.
      */
     public String from(String tableName)
     {
@@ -394,12 +440,12 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Name of Column.
-     * @param varSize Size of Varchar with a range of 0-255.
-     * @param isNull If column data can be Null or Not Null<br>
-     * <b>TRUE</b> - Then column can have a Null Value;
-     * <b>FALSE</b> - Then column cannot have a Null Value;
-     * @return 
+     * @param   column              Name of Column.
+     * @param   varSize             Size of Varchar with a range of 0-255.
+     * @param   isNull              If column data can be Null or Not Null<br>
+     *                              <b>TRUE</b> - Then column can have a Null Value;
+     *                              <b>FALSE</b> - Then column cannot have a Null Value;
+     * @return                      Returns a String.
      */
     public String makeVarcharAttr(String column, int varSize, boolean isNull)
     {
@@ -412,12 +458,12 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Name of Column.
-     * @param isSigned Is Column Signed.
-     * @param isNull Can column contain null values.
-     * @param autoIncrement If this column increments automatically.
-     * @param isPrimary Is Column a primary key.
-     * @return 
+     * @param   column              Name of Column.
+     * @param   isSigned            Is Column Signed.
+     * @param   isNull              Can column contain null values.
+     * @param   autoIncrement       If this column increments automatically.
+     * @param   isPrimary           Is Column a primary key.
+     * @return                      Returns a String.
      */
     public String makeIntAttr(String column, boolean isSigned, boolean isNull, boolean autoIncrement, boolean isPrimary)
     {
@@ -434,12 +480,12 @@ public class DatabaseFunctions
     
     /**
      * 
-     * @param column Name of Column.
-     * @param isSigned Is Column Signed.
-     * @param isNull Can column contain null values.
-     * @param autoIncrement If this column increments automatically.
-     * @param isPrimary Is Column a primary key.
-     * @return 
+     * @param   column              Name of Column.
+     * @param   isSigned            Is Column Signed.
+     * @param   isNull              Can column contain null values.
+     * @param   autoIncrement       If this column increments automatically.
+     * @param   isPrimary           Is Column a primary key.
+     * @return                      Returns a String.
      */
     public String makeDoubleAttr(String column, boolean isSigned, boolean isNull, boolean autoIncrement, boolean isPrimary)
     {
@@ -453,11 +499,11 @@ public class DatabaseFunctions
                 
         return colAndAttr;
     }
-    
+    //--------------------------END-------------------------\\
     /**
      * 
-     * @param array Array to modify and remove first item.
-     * @return Returns the same array with it's first item removed.
+     * @param   array               Array to modify and remove first item.
+     * @return                      Returns the same array with it's first item removed.
      */
     private String[] removeFirstItem(String[] array)
     {
@@ -468,10 +514,11 @@ public class DatabaseFunctions
     }
     
     /**
+     * Recommended for JOptionPane, It contains html tags to allow multiple lines.
      * 
-     * @param firstMessage Personal Message.
-     * @param exceptionMessage Message of the exception to manage.
-     * @return Returns a String with {@code <html>} tags to create multiple lines.
+     * @param   firstMessage        Personal Message.
+     * @param   exceptionMessage    Message of the exception to manage.
+     * @return                      Returns a String with {@code <html>} tags to create multiple lines.
      */
     private String manageErrorMessage(String firstMessage, String exceptionMessage)
     {

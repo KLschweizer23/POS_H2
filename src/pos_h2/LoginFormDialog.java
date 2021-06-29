@@ -9,12 +9,12 @@ import myUtilities.MessageHandler;
 import myUtilities.SystemUtilities;
 import pos_h2_database.*;
 
-public class LoginForm extends javax.swing.JDialog {
+public class LoginFormDialog extends javax.swing.JDialog {
 
     MessageHandler mh = new MessageHandler();
     MainFrame main;
     
-    public LoginForm(MainFrame parent, boolean modal) {
+    public LoginFormDialog(MainFrame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         main = parent;

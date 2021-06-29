@@ -10,6 +10,60 @@ import java.time.format.DateTimeFormatter;
  */
 public class SystemUtilities 
 {
+    //-----------------------------USER FUNCTIONS--------------------------\\
+    
+    /**
+     * 
+     * @return Returns the inputted Number of User.
+     */
+    public String inputNumberUser()
+    {            
+        MessageHandler mh = new MessageHandler();
+        
+        String quantity;
+        boolean pass;
+        do
+        {
+            quantity = mh.input("Enter quantity to add");
+            if(quantity == null)
+                pass = true;
+            else
+            {
+                pass = isANumber(quantity);
+                if(pass)
+                    return quantity;
+            }
+        }while(!pass);
+        
+        return quantity;
+    }
+    
+    /**
+     * 
+     * @return Returns the inputted String of User.
+     */
+    public String inputStringUser()
+    {            
+        MessageHandler mh = new MessageHandler();
+        
+        String quantity;
+        boolean pass;
+        do
+        {
+            quantity = mh.input("Enter quantity to add");
+            if(quantity == null)
+                pass = true;
+            else
+            {
+                pass = quantity.isBlank();
+                if(pass)
+                    return quantity;
+            }
+        }while(!pass);
+        
+        return quantity;
+    }
+    
     //----------------------------STRING FUNCTIONS-------------------------\\
     /**
      * Checks whether a String can be a number.
