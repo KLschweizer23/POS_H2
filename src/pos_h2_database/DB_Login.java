@@ -39,9 +39,22 @@ public class DB_Login {
             
             log.setId(id);
             log.setSalesClerk(map.get(SALES_CLERK).get(i).toString());
-            log.setStatus(map.get(STATUS).get(i).toString());
-            log.setTimeIn(map.get(TIME_IN).get(i).toString());
-            log.setTimeOut(map.get(TIME_OUT).get(i).toString());
+            
+            int nextI = i + 1 < map.get(ID).size() ? i+1 : i;
+            boolean sameClerk = map.get(SALES_CLERK).get(i).toString().equals(map.get(SALES_CLERK).get(nextI).toString());
+            boolean inAndOut = map.get(STATUS).get(i).toString().equals("IN") && map.get(STATUS).get(nextI).toString().equals("OUT");
+            if(sameClerk && inAndOut)
+            {
+                log.setStatus("InAndOut");
+                log.setTimeIn(map.get(TIME_IN).get(i).toString());
+                log.setTimeOut(map.get(TIME_OUT).get(++i).toString());
+            }
+            else
+            {
+                log.setStatus(map.get(STATUS).get(i).toString());
+                log.setTimeIn(map.get(TIME_IN).get(i).toString());
+                log.setTimeOut(map.get(TIME_OUT).get(i).toString());
+            }
             logs.put(id, log);
             idList.add(id);
         }

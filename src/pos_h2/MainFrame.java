@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
         for(int i = 0; dtm2.getRowCount() != 0;)
             dtm2.removeRow(i);
         DB_Transaction tDb = new DB_Transaction();
-        transactions = tDb.processData();
+        transactions = tDb.processData(null, null);
         ArrayList<String> idLists = tDb.getIdList();
         for(int i = idLists.size() - 1; i >= 0; i--)
         {
@@ -611,7 +611,6 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         menuItem_invoice = new javax.swing.JMenuItem();
-        menuItem_transactions = new javax.swing.JMenuItem();
         menuItem_sales = new javax.swing.JMenuItem();
         menuItem_log = new javax.swing.JMenuItem();
 
@@ -1203,10 +1202,12 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu3.add(menuItem_invoice);
 
-        menuItem_transactions.setText("Transactions");
-        jMenu3.add(menuItem_transactions);
-
-        menuItem_sales.setText("Sales");
+        menuItem_sales.setText("Sales (BETA)");
+        menuItem_sales.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_salesActionPerformed(evt);
+            }
+        });
         jMenu3.add(menuItem_sales);
 
         menuItem_log.setText("Log Record");
@@ -1354,7 +1355,19 @@ public class MainFrame extends javax.swing.JFrame {
     private void menuItem_invoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_invoiceActionPerformed
         openInvoiceDialog();
     }//GEN-LAST:event_menuItem_invoiceActionPerformed
+
+    private void menuItem_salesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_salesActionPerformed
+        openSalesDialog();
+    }//GEN-LAST:event_menuItem_salesActionPerformed
     
+    private void openSalesDialog()
+    {
+        SalesDialog sales = new SalesDialog(this, true);
+        int x = (getWidth() - sales.getWidth()) / 2;
+        int y = (getHeight() - sales.getHeight()) / 2;
+        sales.setLocation(x,y);
+        sales.setVisible(true);
+    }
     private void openInvoiceDialog()
     {
         InvoiceDialog invoice = new InvoiceDialog(this, true);
@@ -1487,7 +1500,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItem_remove;
     private javax.swing.JMenuItem menuItem_sales;
     private javax.swing.JMenuItem menuItem_salesClerkDb;
-    private javax.swing.JMenuItem menuItem_transactions;
     private javax.swing.JMenu menu_database;
     private javax.swing.JTable table_display;
     private javax.swing.JTable table_history;

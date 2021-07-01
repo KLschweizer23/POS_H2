@@ -49,8 +49,9 @@ public class DB_Invoice {
         
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
+        String query = dbf.selectAll() + dbf.from(tablePrefix + invoiceName) + dbf.whereEquals(STATUS, getUnpaid ? "Paid" : "Unpaid");
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(tablePrefix + invoiceName, keys, getUnpaid ? "Paid" : "Unpaid", 3, ID, true);
+        HashMap<String, ArrayList> map = dbf.customReturnQuery(query, keys);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size());)
         {
             Invoice invoiceObj = new Invoice();

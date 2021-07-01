@@ -1,8 +1,16 @@
 
 package pos_h2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import pos_h2_database.DB_Login;
+import pos_h2_database.Log;
+
 public class LogDialog extends javax.swing.JDialog {
 
+    DefaultTableModel dtm;
     /**
      * Creates new form LogDialog
      * @param parent
@@ -11,8 +19,62 @@ public class LogDialog extends javax.swing.JDialog {
     public LogDialog(MainFrame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        createColumns();
+        prepareTable();
+        
+        TableColumnModel tcm = table_logs.getColumnModel();
+        table_logs.removeColumn(tcm.getColumn(0));
     }
 
+    public void createColumns()
+    {
+        dtm = new DefaultTableModel(0,0)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        };
+        table_logs.setModel(dtm);
+        dtm.addColumn("ID");
+        dtm.addColumn("Sales Clerk");
+        dtm.addColumn("Time in");
+        dtm.addColumn("Time out");
+    }
+    
+    private void prepareTable()
+    {
+        DB_Login loginDb = new DB_Login();
+        
+        clearTable(dtm);
+        
+        HashMap<String, Log> logs = loginDb.processData("", 0);
+        ArrayList<String> idLists = loginDb.getIdList();
+        
+        for(int i = 0; i < idLists.size(); i++)
+        {
+            String id = idLists.get(i);
+            String[] rowData =
+            {
+                logs.get(id).getId(),
+                logs.get(id).getSalesClerk(),
+                logs.get(id).getTimeIn().equals("null") ? "No Record" : logs.get(id).getTimeIn(),
+                logs.get(id).getTimeOut().equals("null") ? "No Record" : logs.get(id).getTimeOut()
+            };
+            dtm.addRow(rowData);
+        }
+        if(table_logs.getRowCount() > 0)
+            table_logs.setRowSelectionInterval(0, 0);
+        
+        table_logs.setRowHeight(30);
+    }
+    private void clearTable(DefaultTableModel dtm)
+    {
+        for(int i = 0; dtm.getRowCount() != 0;)
+            dtm.removeRow(i);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -22,17 +84,38 @@ public class LogDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        table_logs = new javax.swing.JTable();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jScrollPane1.setFocusable(false);
+
+        table_logs.setFillsViewportHeight(true);
+        table_logs.setFocusable(false);
+        table_logs.setRequestFocusEnabled(false);
+        table_logs.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table_logs.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table_logs.setShowVerticalLines(false);
+        table_logs.getTableHeader().setResizingAllowed(false);
+        table_logs.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(table_logs);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 515, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 506, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -40,5 +123,7 @@ public class LogDialog extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable table_logs;
     // End of variables declaration//GEN-END:variables
 }

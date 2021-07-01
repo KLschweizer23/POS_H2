@@ -29,15 +29,24 @@ public class DB_Transaction {
         dbf.createTable(table, columnToKeys(true));
     }
     
-    public HashMap<String, Transaction> processData()
+    public HashMap<String, Transaction> processData(String fromDate, String toDate)
     {
         transaction.clear();
         idList.clear();
         
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
+        HashMap<String, ArrayList> map;
+        if(fromDate == null && toDate == null)
+        {
+            map = dbf.selectAllData(table, keys, "", 0, T_ID, true);
+        }
+        else
+        {
+            String query = dbf.selectAll() + dbf.from(table) + dbf.where(DATE) + dbf.between(fromDate, toDate);
+            map = dbf.customReturnQuery(query, keys);
+        }
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, "", 0, T_ID, true);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size());)
         {
             Transaction transactionObject = new Transaction();
@@ -68,7 +77,6 @@ public class DB_Transaction {
         }
         return transaction;
     }
-    
     public void insertData(Transaction transaction)
     {
         DatabaseFunctions df = new DatabaseFunctions();

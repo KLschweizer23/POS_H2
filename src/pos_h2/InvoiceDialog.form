@@ -86,24 +86,28 @@
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="button_newInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="button_payInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="button_removeInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" alignment="3" groupAlignment="3" attributes="0">
-                                  <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="label_totalInvoice" alignment="3" pref="22" max="32767" attributes="0"/>
                                   <Component id="checkbox_unpaidOnly" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="button_newInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="button_payInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="button_removeInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jScrollPane2" min="-2" pref="188" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="button_addItem" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="button_removeItem" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
-                              <Component id="label_total" alignment="3" pref="22" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="button_addItem" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="button_removeItem" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="label_total" alignment="3" pref="22" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jScrollPane3" pref="191" max="32767" attributes="0"/>

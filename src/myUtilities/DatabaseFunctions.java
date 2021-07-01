@@ -139,6 +139,7 @@ public class DatabaseFunctions
         HashMap<String, ArrayList> map = new HashMap();
         String ascOrDesc = isAscending ? "ASC" : "DESC";
         String query = "SELECT * FROM " + table + " WHERE " + column[columnIndexFilter] + " LIKE '%" + goodString(filterKey) + "%' ORDER BY " + orderBy + " " + ascOrDesc;
+        System.out.println(query + "---");
         try
         {
             map = executeReturnQuery(query, column);
@@ -308,7 +309,7 @@ public class DatabaseFunctions
      */
     public String like (String data)
     {
-        return " LIKE '%" + goodString(data) + "%'";
+        return " LIKE '%" + goodString(data) + "%' ";
     }
     
     
@@ -328,7 +329,7 @@ public class DatabaseFunctions
      */
     public String where(String column)
     {
-        return " WHERE " + column;
+        return " WHERE " + column + " ";
     }
     
     /**
@@ -370,7 +371,7 @@ public class DatabaseFunctions
      */
     public String andEquals (String column, String data)
     {
-        return "AND " + column + " = '" + goodString(data) + "'";
+        return "AND " + column + " = '" + goodString(data) + "' ";
     }    
     
     /**
@@ -381,7 +382,7 @@ public class DatabaseFunctions
      */
     public String andNotEquals (String column, String data)
     {
-        return "AND " + column + " != '" + goodString(data) + "'";
+        return "AND " + column + " != '" + goodString(data) + "' ";
     }
   
     /**
@@ -435,7 +436,18 @@ public class DatabaseFunctions
      */
     public String from(String tableName)
     {
-        return "FROM " + tableName;
+        return "FROM " + tableName + " ";
+    }
+    
+    /**
+     * 
+     * @param   firstParam          First Parameter for between function.
+     * @param   secondParam         Second Parameter for between function.
+     * @return                      Returns a string for execution.
+     */
+    public String between(String firstParam, String secondParam)
+    {
+        return "BETWEEN '" + firstParam + "' AND '" + secondParam + "' ";
     }
     
     /**
