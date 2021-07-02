@@ -14,9 +14,10 @@ public class SystemUtilities
     
     /**
      * 
+     * @param message String to display.
      * @return Returns the inputted Number of User.
      */
-    public String inputNumberUser()
+    public String inputNumberUser(String message)
     {            
         MessageHandler mh = new MessageHandler();
         
@@ -24,7 +25,7 @@ public class SystemUtilities
         boolean pass;
         do
         {
-            quantity = mh.input("Enter quantity to add");
+            quantity = mh.input(message);
             if(quantity == null)
                 pass = true;
             else
@@ -40,9 +41,10 @@ public class SystemUtilities
     
     /**
      * 
+     * @param message String to display.
      * @return Returns the inputted String of User.
      */
-    public String inputStringUser()
+    public String inputStringUser(String message)
     {            
         MessageHandler mh = new MessageHandler();
         
@@ -50,12 +52,12 @@ public class SystemUtilities
         boolean pass;
         do
         {
-            quantity = mh.input("Enter quantity to add");
+            quantity = mh.input(message);
             if(quantity == null)
                 pass = true;
             else
             {
-                pass = quantity.isBlank();
+                pass = !quantity.isBlank();
                 if(pass)
                     return quantity;
             }

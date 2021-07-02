@@ -30,18 +30,19 @@ public class DB_Invoice {
         
         String[] keys = {"tables"};
         
-        String query = dbf.getTables(con.getSchemaName(), keys[0]) + dbf.and() + "TABLE_SCHEMA " + dbf.like(tablePrefix);
+        String query = dbf.getTables(con.getSchemaName(), keys[0]) + dbf.and() + "TABLE_NAME " + dbf.like(tablePrefix);
+        System.out.println(query);
         HashMap<String, ArrayList> map = dbf.customReturnQuery(query, keys);
         
         ArrayList<String> listOfTables = new ArrayList<>();
         
-        for(int i = 0; i < (map.get(keys[0]) == null ? 0 : map.get(keys[0]).size());)
+        for(int i = 0; i < (map.get(keys[0]) == null ? 0 : map.get(keys[0]).size()); i++)
             listOfTables.add(map.get(keys[0]).get(i).toString().substring(tablePrefix.length()));
         
         return listOfTables;
     }
     
-    public HashMap<String, Invoice> processData(String invoiceName)
+    public HashMap<String, Invoice> processData(String invoiceName, boolean getUnpaid)
     {
         invoice.clear();
         idList.clear();
@@ -49,7 +50,7 @@ public class DB_Invoice {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(tablePrefix + invoiceName, keys, "", 0, ID, false);
+        HashMap<String, ArrayList> map = dbf.selectAllData(tablePrefix + invoiceName, keys, getUnpaid ? "Paid" : "Unpaid", 3, ID, true);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size());)
         {
             Invoice invoiceObj = new Invoice();
@@ -60,18 +61,21 @@ public class DB_Invoice {
             invoiceObj.setDate(map.get(DATE).get(i).toString());
             invoiceObj.setStatus(map.get(STATUS).get(i).toString());
             ArrayList<Item> listOfItems = new ArrayList<>();
-            do
+            System.out.println(map.get(I_NAME).get(i).toString());
+            i++;
+            while(i < map.get(ID).size() && map.get(ID_INVOICE).get(i - 1).toString().equals(map.get(ID_INVOICE).get(i).toString()))
             {            
                 Item item = new Item();
-                item.setId(map.get(I_ID).get(i).toString());
+                item.setId(map.get(ID).get(i).toString());
                 item.setName(map.get(I_NAME).get(i).toString());
+                System.out.println(map.get(I_NAME).get(i).toString());
                 item.setArticle(map.get(I_ARTICLE).get(i).toString());
                 item.setBrand(map.get(I_BRAND).get(i).toString());
                 item.setQuantity(map.get(I_QUANTITY).get(i).toString());
                 item.setPrice(map.get(I_PRICE).get(i).toString());
                 listOfItems.add(item);
                 i++;
-            }while(i < map.get(ID).size() && map.get(ID_INVOICE).get(i - 1).toString().equals(map.get(ID_INVOICE).get(i).toString()));
+            }
             invoiceObj.setItem(listOfItems);
             invoice.put(id, invoiceObj);
             idList.add(id);
@@ -100,7 +104,15 @@ public class DB_Invoice {
     public void updateInvoice(String invoiceName, Invoice invoice)
     {
         DatabaseFunctions dbf = new DatabaseFunctions();
-        dbf.updateData(tablePrefix + invoiceName, columnToKeys(false), dataToKeys(invoice, false));
+        String[] myKeys = {ID_INVOICE, ID_INVOICE, DATE, STATUS, I_ID, I_NAME, I_BRAND, I_ARTICLE, I_QUANTITY, I_PRICE};
+        dbf.updateData(tablePrefix + invoiceName, myKeys, dataToKeys(invoice, false));
+    }
+    
+    public void deleteData(String invoiceName, boolean individualId, String id)
+    {
+        String deleteColumn = individualId ? ID : ID_INVOICE;
+        DatabaseFunctions df = new DatabaseFunctions();
+        df.deleteData(tablePrefix + invoiceName, deleteColumn, id);
     }
     
     public String getAvailableIDInvoice(String invoiceName)
@@ -178,12 +190,12 @@ public class DB_Invoice {
             dbf.makeIntAttr(ID_INVOICE, false, false, false, false),
             dbf.makeVarcharAttr(DATE, 150, false),
             dbf.makeVarcharAttr(STATUS, 150, false),
-            dbf.makeIntAttr(I_ID, false, false, false, false),
-            dbf.makeVarcharAttr(I_NAME, 150, false),
-            dbf.makeVarcharAttr(I_BRAND, 150, false),
-            dbf.makeVarcharAttr(I_ARTICLE, 150, false),
-            dbf.makeDoubleAttr(I_QUANTITY, false, false, false, false),
-            dbf.makeDoubleAttr(I_PRICE, false, false, false, false)
+            dbf.makeVarcharAttr(I_ID, 150, true),
+            dbf.makeVarcharAttr(I_NAME, 150, true),
+            dbf.makeVarcharAttr(I_BRAND, 150, true),
+            dbf.makeVarcharAttr(I_ARTICLE, 150, true),
+            dbf.makeVarcharAttr(I_QUANTITY, 150, true),
+            dbf.makeVarcharAttr(I_PRICE, 150, true)
         };
         return withAttr ? keysWithAttr : keys;
     }

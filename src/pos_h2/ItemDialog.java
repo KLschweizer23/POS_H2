@@ -199,6 +199,7 @@ public class ItemDialog extends javax.swing.JDialog {
     private void addData()
     {
         MessageHandler mh = new MessageHandler();
+        SystemUtilities su = new SystemUtilities();
         if(itemTable.getRowCount() > 0)
         {
             Item itemObj = item.get(itemTable.getValueAt(itemTable.getSelectedRow(), 0).toString());
@@ -214,8 +215,7 @@ public class ItemDialog extends javax.swing.JDialog {
             }
             else if(stockMode && dialog == null)
             {
-                SystemUtilities su = new SystemUtilities();
-                String quantity = su.inputNumberUser();
+                String quantity = su.inputNumberUser("Enter number of stocks: ");
                 if(quantity != null)
                 {
                     String[] rowData = {itemObj.getId(), itemObj.getName(), quantity};
@@ -232,7 +232,19 @@ public class ItemDialog extends javax.swing.JDialog {
                 {
                     InvoiceDialog invoiceDialog = (InvoiceDialog)dialog;
                     
-                }
+                    String quantity = su.inputNumberUser("Enter number of items to add: ");
+                    if(quantity != null)
+                    {
+                        int currentQuantity = Integer.parseInt(itemObj.getQuantity());
+                        int quantityToBuy = Integer.parseInt(quantity);
+                        if(currentQuantity >= quantityToBuy)
+                        {
+                            itemObj.setQuantityToBuy(quantity);
+                            invoiceDialog.addItem(itemObj);
+                            dispose();
+                        } else mh.warning("Not enough stocks for this item!");
+                    }
+                } else mh.warning("There's not enough stocks for this item!");
             }
         }
     }

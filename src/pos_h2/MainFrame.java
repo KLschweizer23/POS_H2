@@ -1194,7 +1194,6 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuBar1.add(menu_database);
 
         jMenu3.setText("Others");
-        jMenu3.setEnabled(false);
 
         menuItem_invoice.setText("Invoice");
         menuItem_invoice.addActionListener(new java.awt.event.ActionListener() {

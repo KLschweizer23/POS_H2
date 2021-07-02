@@ -410,8 +410,6 @@ public class ItemDbDialog extends javax.swing.JDialog {
         field_price.setText("");
         setTextFieldFormat(field_price, true);
         
-        field_quantity.setEnabled(false);
-        
         button_add.setEnabled(true);
         button_update.setEnabled(false);
         button_delete.setEnabled(false);

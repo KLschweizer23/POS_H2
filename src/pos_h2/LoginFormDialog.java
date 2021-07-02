@@ -1,8 +1,6 @@
 package pos_h2;
 
 import java.awt.event.KeyEvent;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import myUtilities.MessageHandler;
@@ -20,6 +18,7 @@ public class LoginFormDialog extends javax.swing.JDialog {
         main = parent;
         
         commands();
+        setAlwaysOnTop(true);
     }
     
     private void commands()
@@ -165,6 +164,7 @@ public class LoginFormDialog extends javax.swing.JDialog {
             clerk.setLastname("admin");
             main.setCurrentClerk(clerk);
             recordLogin(clerk);
+            setAlwaysOnTop(false);
             mh.message("Admin successfully logged in!");
             dispose();
         } 
@@ -172,6 +172,7 @@ public class LoginFormDialog extends javax.swing.JDialog {
         {
             main.setCurrentClerk(clerk);
             recordLogin(clerk);
+            setAlwaysOnTop(false);
             mh.message("You have successfully logged in!");
             dispose();
         }
