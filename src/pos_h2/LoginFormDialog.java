@@ -35,11 +35,11 @@ public class LoginFormDialog extends javax.swing.JDialog {
     {
         int property = JComponent.WHEN_IN_FOCUSED_WINDOW;
         
-        getRootPane().registerKeyboardAction(e -> {
+        jPanel1.registerKeyboardAction(e -> {
             System.exit(0);
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), property);
         
-        getRootPane().registerKeyboardAction(e -> {
+        jPanel1.registerKeyboardAction(e -> {
             login();
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), property);
     }
