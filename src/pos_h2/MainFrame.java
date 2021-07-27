@@ -1,5 +1,8 @@
 package pos_h2;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
@@ -22,6 +27,7 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
@@ -854,7 +860,6 @@ public class MainFrame extends javax.swing.JFrame {
         table_history.setFocusable(false);
         table_history.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table_history.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        table_history.setShowVerticalLines(false);
         table_history.getTableHeader().setResizingAllowed(false);
         table_history.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(table_history);
@@ -1414,18 +1419,18 @@ public class MainFrame extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        
+//        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//            System.out.println(info.getClassName());
+//            if ("Nimbus".equals(info.getName())) {
+//                break;
+//            }
+//        }
+    try {
+            javax.swing.UIManager.setLookAndFeel(new FlatLightLaf());
+        } 
+    catch (UnsupportedLookAndFeelException ex) {
+        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+    }
         //</editor-fold>
 
         /* Create and display the form */

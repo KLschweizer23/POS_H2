@@ -1,8 +1,10 @@
 package myUtilities;
 
 import java.awt.Component;
+import java.awt.Image;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -101,6 +103,24 @@ public class SystemUtilities
             valid = false; 
         } 
         return valid;
+    }
+    
+    //------------------------IMAGE/ICONS FUNCTIONS---------------------\\
+    /**
+     * Gets the image on a default resource path in "Images" folder/package
+     * 
+     * @param imageName Name of Image.
+     * @param height height of Image.
+     * @param width width of Image.
+     * @return 
+     */
+    public ImageIcon getScaledImageIcon(String imageName, int height, int width)
+    {
+        ImageIcon imageIcon = new ImageIcon(new ImageIcon(getClass().getResource("/Images/" + imageName)).getImage());
+        Image image = imageIcon.getImage();
+        Image newImage = image.getScaledInstance(height, width, Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(newImage);
+        return imageIcon;
     }
     
     //----------------------------TIME FUNCTIONS-------------------------\\

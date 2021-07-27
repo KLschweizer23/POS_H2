@@ -77,7 +77,6 @@ public class DatabaseFunctions
             String insert = "INSERT INTO " + tableName + "(" + arrayToString(column, true, false, false) + ") VALUES (" + arrayToString(data, false, true, true) + ");";
             try
             {
-                System.out.println(insert);
                 executeQuery(insert);
             }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error inserting into the Table " + tableName + "!", sqlE.toString()));}
         }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column should be greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");
@@ -97,11 +96,9 @@ public class DatabaseFunctions
         if(column.length == data.length)
         {
             String condition = whereEquals(column[0], data[0]);
-            System.out.println(condition);
             String update = "UPDATE " + tableName + " SET " + arrayToStringSetter(column, data) + condition;
             try
             {
-                System.out.println(update);
                 executeQuery(update);
             }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error updating the Table " + tableName + "!", sqlE.toString()));}
         }else mh.error("Column size and Data size doesn't match. There should be no difference. column: " + column.length + "; data: " + data.length);
@@ -139,7 +136,6 @@ public class DatabaseFunctions
         HashMap<String, ArrayList> map = new HashMap();
         String ascOrDesc = isAscending ? "ASC" : "DESC";
         String query = "SELECT * FROM " + table + " WHERE " + column[columnIndexFilter] + " LIKE '%" + goodString(filterKey) + "%' ORDER BY " + orderBy + " " + ascOrDesc;
-        System.out.println(query + "---");
         try
         {
             map = executeReturnQuery(query, column);
@@ -258,9 +254,7 @@ public class DatabaseFunctions
         
         for(int i = removeFirstItem ? 1 : 0; i < array.length; i++)
         {
-            System.out.println(returnVal);
             returnVal += "," + isDataChar + (isBadString ? goodString(array[i]) : array[i]) + isDataChar;
-            System.out.println(returnVal + " - f");
         }
         
         returnVal = returnVal.substring(1);

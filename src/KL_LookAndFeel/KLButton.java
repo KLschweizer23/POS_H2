@@ -1,7 +1,6 @@
 package KL_LookAndFeel;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -9,13 +8,10 @@ import java.awt.Insets;
 import java.awt.Point;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -47,6 +43,7 @@ public class KLButton extends JButton{
                 
             }
         });
+        this.addMouseListener(new Hover(this));
     }
     
     @Override
@@ -62,4 +59,13 @@ public class KLButton extends JButton{
 
         super.paintComponent(g);
     }
+
+    @Override
+    protected void paintBorder(Graphics g) {
+        
+        
+        super.paintBorder(g); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }
