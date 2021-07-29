@@ -23,7 +23,10 @@ public class LoginFormDialog extends javax.swing.JDialog {
         field_password.setEchoChar('\u25CF');
         
         SystemUtilities su = new SystemUtilities();
-        label_logo.setIcon(su.getScaledImageIcon("logo_h2", 100, 100));
+        
+        String currentUser = "h2";
+        
+        label_logo.setIcon(su.getScaledImageIcon("logo_" + currentUser + ".jpg", 382, 270));
     }
     
     private void commands()
@@ -43,6 +46,10 @@ public class LoginFormDialog extends javax.swing.JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), property);
         
         field_password.registerKeyboardAction(e -> {
+            login();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), property);
+        
+        getRootPane().registerKeyboardAction(e -> {
             login();
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), property);
     }
@@ -170,11 +177,15 @@ public class LoginFormDialog extends javax.swing.JDialog {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setPreferredSize(new java.awt.Dimension(357, 273));
 
+        label_logo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label_logo.setFocusable(false);
+        label_logo.setRequestFocusEnabled(false);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(label_logo, javax.swing.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+            .addComponent(label_logo, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -188,7 +199,8 @@ public class LoginFormDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

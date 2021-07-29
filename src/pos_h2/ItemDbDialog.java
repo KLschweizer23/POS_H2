@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import myUtilities.MessageHandler;
 import pos_h2_database.DB_Item;
 import pos_h2_database.Item;
@@ -35,7 +36,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
                 return false;
             }
         };
-        itemTable.setModel(dtm);
+        table_item.setModel(dtm);
         dtm.addColumn("ID");
         dtm.addColumn("Item");
         dtm.addColumn("Article");
@@ -45,6 +46,10 @@ public class ItemDbDialog extends javax.swing.JDialog {
     }
     private void setup()
     {
+        //SETUP
+        TableColumnModel tcm = table_item.getColumnModel();
+        table_item.removeColumn(tcm.getColumn(0));
+        
         //COMMANDS
 
     }
@@ -71,7 +76,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
             };
             dtm.addRow(rowData);
         }
-        itemTable.setRowHeight(rowHeight);
+        table_item.setRowHeight(rowHeight);
     }
     private void clearTable()
     {
@@ -82,7 +87,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
     }
     private void setupTable()
     {
-        itemTable.addMouseListener(new MouseListener() {
+        table_item.addMouseListener(new MouseListener() {
             private boolean onTable = false;
             
             @Override
@@ -92,7 +97,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
                     Point p = e.getPoint();
                     int y = p.y / rowHeight;
                     if(y < dtm.getRowCount())
-                        setFields(item.get(itemTable.getValueAt(y, 0)));
+                        setFields(item.get(dtm.getValueAt(y, 0) + ""));
                 }
             }
 
@@ -117,7 +122,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
             }
         });
         
-        itemTable.addMouseMotionListener(new MouseMotionListener() {
+        table_item.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 
@@ -128,7 +133,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
                 Point p = e.getPoint();
                 int y = p.y / rowHeight;
                 if(y < dtm.getRowCount())
-                    itemTable.setRowSelectionInterval(0, y);
+                    table_item.setRowSelectionInterval(0, y);
             }
         });
     }
@@ -144,7 +149,7 @@ public class ItemDbDialog extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        itemTable = new javax.swing.JTable();
+        table_item = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         button_add = new javax.swing.JButton();
         button_update = new javax.swing.JButton();
@@ -167,14 +172,14 @@ public class ItemDbDialog extends javax.swing.JDialog {
 
         jScrollPane1.setFocusable(false);
 
-        itemTable.setFillsViewportHeight(true);
-        itemTable.setFocusable(false);
-        itemTable.setRequestFocusEnabled(false);
-        itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        itemTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        itemTable.getTableHeader().setResizingAllowed(false);
-        itemTable.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(itemTable);
+        table_item.setFillsViewportHeight(true);
+        table_item.setFocusable(false);
+        table_item.setRequestFocusEnabled(false);
+        table_item.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table_item.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table_item.getTableHeader().setResizingAllowed(false);
+        table_item.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(table_item);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Item");
@@ -345,9 +350,9 @@ public class ItemDbDialog extends javax.swing.JDialog {
         {
             DB_Item itemDb = new DB_Item();
             
-            Item item = getItem();
+            Item newItem = getItem();
             
-            itemDb.insertData(item);
+            itemDb.insertData(newItem);
             processTable("", 0);
             emptyFields();
         } else mh.warning("Please fill the fields properly!");
@@ -369,9 +374,9 @@ public class ItemDbDialog extends javax.swing.JDialog {
         {
             DB_Item itemDb = new DB_Item();
             
-            Item item = getItem();
-            item.setId(label_id.getText());
-            itemDb.updateData(item);
+            Item newItem = getItem();
+            newItem.setId(label_id.getText());
+            itemDb.updateData(newItem);
             processTable("", 0);
             emptyFields();
         } else mh.warning("Please fill the fields properly!");
@@ -389,9 +394,9 @@ public class ItemDbDialog extends javax.swing.JDialog {
     {
         DB_Item itemDb = new DB_Item();
         
-        Item item = getItem();
-        item.setId(label_id.getText());
-        itemDb.deleteData(item);
+        Item newItem = getItem();
+        newItem.setId(label_id.getText());
+        itemDb.deleteData(newItem);
         processTable("", 0);
         emptyFields();
     }
@@ -503,15 +508,15 @@ public class ItemDbDialog extends javax.swing.JDialog {
     }
     private Item getItem()
     {
-        Item item = new Item();
-        item.setName(field_item.getText());
-        item.setArticle(field_article.getText());
-        item.setBrand(field_brand.getText());
-        item.setQuantity(field_quantity.getText());
-        item.setPrice(field_price.getText());
-        item.setSold("0");
+        Item newItem = new Item();
+        newItem.setName(field_item.getText());
+        newItem.setArticle(field_article.getText());
+        newItem.setBrand(field_brand.getText());
+        newItem.setQuantity(field_quantity.getText());
+        newItem.setPrice(field_price.getText());
+        newItem.setSold("0");
         
-        return item;
+        return newItem;
     }
     /**
      * Creates new form ItemDb
@@ -535,7 +540,6 @@ public class ItemDbDialog extends javax.swing.JDialog {
     private javax.swing.JTextField field_item;
     private javax.swing.JTextField field_price;
     private javax.swing.JTextField field_quantity;
-    private javax.swing.JTable itemTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -545,5 +549,6 @@ public class ItemDbDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label_id;
     private javax.swing.JLabel label_labelId;
+    private javax.swing.JTable table_item;
     // End of variables declaration//GEN-END:variables
 }
