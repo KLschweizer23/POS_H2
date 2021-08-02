@@ -1,7 +1,5 @@
 package pos_h2;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -1425,12 +1423,12 @@ public class MainFrame extends javax.swing.JFrame {
 //                break;
 //            }
 //        }
-    try {
-            javax.swing.UIManager.setLookAndFeel(new FlatLightLaf());
-        } 
-    catch (UnsupportedLookAndFeelException ex) {
-        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        try {
+                javax.swing.UIManager.setLookAndFeel(new FlatLightLaf());
+            } 
+        catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //</editor-fold>
 
         /* Create and display the form */

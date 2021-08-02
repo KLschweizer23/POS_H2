@@ -48,7 +48,7 @@ public class DatabaseFunctions
         try
         {
             executeQuery(create);
-        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error creating the table " + tableName + "!", sqlE.toString()));}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error creating the table " + tableName + "!", sqlE.toString()), true);}
     }
     
     /**
@@ -61,7 +61,7 @@ public class DatabaseFunctions
         try
         {
             executeQuery(drop);
-        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error deleting the table " + tableName + "!", sqlE.toString()));}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error deleting the table " + tableName + "!", sqlE.toString()), false);}
     }
     
     /**
@@ -78,8 +78,8 @@ public class DatabaseFunctions
             try
             {
                 executeQuery(insert);
-            }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error inserting into the Table " + tableName + "!", sqlE.toString()));}
-        }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column should be greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>");
+            }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error inserting into the Table " + tableName + "!", sqlE.toString()), false);}
+        }else mh.error("<html>Column size and Data size doesn't match. There should only be a difference of one (1) where column should be greater than data.<br>Column: " + column.length + "; Data: " + data.length + "</html>", false);
     }
     
     /**
@@ -100,8 +100,8 @@ public class DatabaseFunctions
             try
             {
                 executeQuery(update);
-            }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error updating the Table " + tableName + "!", sqlE.toString()));}
-        }else mh.error("Column size and Data size doesn't match. There should be no difference. column: " + column.length + "; data: " + data.length);
+            }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error updating the Table " + tableName + "!", sqlE.toString()), true);}
+        }else mh.error("Column size and Data size doesn't match. There should be no difference. column: " + column.length + "; data: " + data.length, false);
     }    
     
     /**
@@ -118,7 +118,7 @@ public class DatabaseFunctions
         try
         {
             executeQuery(delete);
-        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error deleting data in the Table " + tableName + "!", sqlE.toString()));}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error deleting data in the Table " + tableName + "!", sqlE.toString()), false);}
     }
     
     /**
@@ -139,7 +139,7 @@ public class DatabaseFunctions
         try
         {
             map = executeReturnQuery(query, column);
-        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error Retrieving Data from Database -> '" + query + "'!", sqlE.toString()));}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error Retrieving Data from Database -> '" + query + "'!", sqlE.toString()), true);}
         return map;
     }
     
@@ -155,7 +155,7 @@ public class DatabaseFunctions
         try
         {
             map = executeReturnQuery(query, keyName);
-        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error performing this query ->'" + query + "'!", sqlE.toString()));}
+        }catch(SQLException sqlE){mh.error(manageErrorMessage("There was an error performing this query ->'" + query + "'!", sqlE.toString()), true);}
         
         return map;
     }

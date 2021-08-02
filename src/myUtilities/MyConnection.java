@@ -17,8 +17,10 @@ public class MyConnection
     
     public Connection get()
     {
+        SystemUtilities su = new SystemUtilities();
+        
         String driver = "com.mysql.jdbc.Driver";
-        String url = "jdbc:mysql://localhost:3306/" + schemaName;
+        String url = "jdbc:mysql://" + su.getSingleStringFromFile("config.txt") + ":3306/" + schemaName;
         String username = "root";
         String password = "umtc";
         Connection con = null;
@@ -26,7 +28,7 @@ public class MyConnection
         {
             Class.forName(driver);
             con = DriverManager.getConnection(url,username,password);
-        }catch(ClassNotFoundException | SQLException e){JOptionPane.showMessageDialog(null, errorMsg + e, errorTitle, JOptionPane.ERROR_MESSAGE);}
+        }catch(ClassNotFoundException | SQLException e){JOptionPane.showMessageDialog(null, errorMsg + e, errorTitle, JOptionPane.ERROR_MESSAGE);System.exit(0);}
         return con;
     }
     

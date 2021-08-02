@@ -8,9 +8,11 @@ public class MessageHandler
     {
         JOptionPane.showMessageDialog(null, message, "System Message", JOptionPane.INFORMATION_MESSAGE);
     }
-    public void error(String message)
+    public void error(String message, boolean exitAfterMessage)
     {
         JOptionPane.showMessageDialog(null, message, "System Error", JOptionPane.ERROR_MESSAGE);
+        if(exitAfterMessage)
+            System.exit(0);
     }
     public int confirm(String message)
     {

@@ -260,7 +260,7 @@ public class LoginFormDialog extends javax.swing.JDialog {
         else
         {
             setAlwaysOnTop(false);
-            mh.error("Credentials not found!");
+            mh.error("Credentials not found!", false);
         }
         
     }

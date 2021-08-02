@@ -2,8 +2,13 @@ package myUtilities;
 
 import java.awt.Component;
 import java.awt.Image;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -151,5 +156,27 @@ public class SystemUtilities
                 width=300;
             columnModel.getColumn(column).setPreferredWidth(width);
         }
+    }
+    
+    //---------------------------- FILE FUNCTIONS ------------------------\\
+    public String getSingleStringFromFile(File file)
+    {
+        return getFile(file);
+    }
+    public String getSingleStringFromFile(String fileName)
+    {
+        return getFile(new File(fileName));
+    }
+    private String getFile(File file)
+    {        
+        String singleString = null;
+        try {
+            Scanner reader = new Scanner(file);
+            while(reader.hasNextLine())
+                singleString = reader.nextLine();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MyConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return singleString;
     }
 }
