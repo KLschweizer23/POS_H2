@@ -613,6 +613,7 @@ public class MainFrame extends javax.swing.JFrame {
         menuItem_salesClerkDb = new javax.swing.JMenuItem();
         jSeparator10 = new javax.swing.JPopupMenu.Separator();
         jMenuItem5 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         menuItem_invoice = new javax.swing.JMenuItem();
         menuItem_sales = new javax.swing.JMenuItem();
@@ -1165,7 +1166,7 @@ public class MainFrame extends javax.swing.JFrame {
         menu_database.setText("Database");
         menu_database.setEnabled(false);
 
-        menuItem_itemDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_itemDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItem_itemDb.setText("Item Database");
         menuItem_itemDb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1174,7 +1175,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         menu_database.add(menuItem_itemDb);
 
-        menuItem_salesClerkDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItem_salesClerkDb.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItem_salesClerkDb.setText("Sales Clerk Database");
         menuItem_salesClerkDb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1192,6 +1193,15 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         menu_database.add(jMenuItem5);
+
+        jMenuItem6.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem6.setText("Transfer Stocks");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        menu_database.add(jMenuItem6);
 
         jMenuBar1.add(menu_database);
 
@@ -1362,6 +1372,18 @@ public class MainFrame extends javax.swing.JFrame {
     private void menuItem_salesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_salesActionPerformed
         openSalesDialog();
     }//GEN-LAST:event_menuItem_salesActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        openStocksTransfer();
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+    
+    private void openStocksTransfer(){
+        TransferStockDialog transfer = new TransferStockDialog(this, true);
+        int x = (getWidth() - transfer.getWidth()) / 2;
+        int y = (getHeight() - transfer.getHeight()) / 2;
+        transfer.setLocation(x,y);
+        transfer.setVisible(true);
+    }
     
     private void openSalesDialog()
     {
@@ -1472,6 +1494,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;

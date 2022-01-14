@@ -222,7 +222,7 @@ public class ItemDialog extends javax.swing.JDialog {
                     dtm2.addRow(rowData);
 
                     if(displayTable.getRowCount() > 0)
-                            displayTable.setRowSelectionInterval(0, 0);
+                        displayTable.setRowSelectionInterval(0, 0);
                     displayTable.setRowHeight(20);
                 }
             }
