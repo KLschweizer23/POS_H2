@@ -6,7 +6,6 @@ import javax.swing.KeyStroke;
 import myUtilities.MessageHandler;
 import myUtilities.SystemUtilities;
 import pos_h2_database.*;
-import KL_LookAndFeel.*;
 
 public class LoginFormDialog extends javax.swing.JDialog {
 
@@ -26,7 +25,7 @@ public class LoginFormDialog extends javax.swing.JDialog {
         
         String currentUser = "h2";
         
-        label_logo.setIcon(su.getScaledImageIcon("logo_" + currentUser + ".jpg", 382, 270));
+        //label_logo.setIcon(su.getScaledImageIcon("logo_" + currentUser + ".jpg", 382, 270));
     }
     
     private void commands()

@@ -96,7 +96,6 @@ public class LogDialog extends javax.swing.JDialog {
         table_logs.setRequestFocusEnabled(false);
         table_logs.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table_logs.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        table_logs.setShowVerticalLines(false);
         table_logs.getTableHeader().setResizingAllowed(false);
         table_logs.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(table_logs);

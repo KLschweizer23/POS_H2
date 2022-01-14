@@ -1,16 +1,39 @@
 package pos_h2;
 
+import extraClasses.ChartData;
+import extraClasses.InventoryObject;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import myUtilities.MessageHandler;
+import myUtilities.SystemUtilities;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 import static pos_h2.MainFrame.myFrame;
 import pos_h2_database.DB_Transaction;
 import pos_h2_database.Item;
@@ -33,8 +56,8 @@ public class SalesDialog extends javax.swing.JDialog {
         
         myFrame = parent;
         
-        prepareDate(combobox_fromMonth, 1);
-        changeDay(combobox_fromMonth, combobox_fromDay, combobox_fromYear, 1, 2021);
+//        prepareDate(combobox_fromMonth, 1);
+//        changeDay(combobox_fromMonth, combobox_fromDay, combobox_fromYear, 1, 2021);
         prepareCurrentDate();
         createColumns();
         prepareTable();
@@ -61,33 +84,26 @@ public class SalesDialog extends javax.swing.JDialog {
                     table_transactions.setRowSelectionInterval(0, y);
             }
         });
-        table_transactions.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent me)
-            {
-                if(SwingUtilities.isLeftMouseButton(me))
-                {
-                    String id = table_transactions.getValueAt(table_transactions.getSelectedRow(), 0).toString();
-                    TransactionDetailsDialog tDialog = new TransactionDetailsDialog(myFrame, true, transactions.get(id));
-                    int x = (getWidth() - tDialog.getWidth()) / 2;
-                    int y = (getHeight() - tDialog.getHeight()) / 2;
-                    tDialog.setLocation(x,y);
-                    tDialog.setVisible(true);
-                }
-            }
-        });
     }
     private void prepareCurrentDate()
     {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");  
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
         LocalDateTime now = LocalDateTime.now();  
         String date = dtf.format(now);
-        int selectedYear = Integer.parseInt(date.split("/")[0]);
-        int selectedMonth = Integer.parseInt(date.split("/")[1]);
-        int selectedDay = Integer.parseInt(date.split("/")[2]);
+        int selectedYear = Integer.parseInt(date.split("-")[0]);
+        int selectedMonth = Integer.parseInt(date.split("-")[1]);
+        int selectedDay = Integer.parseInt(date.split("-")[2]);
+        
+        LocalDateTime past = now.minus(6, ChronoUnit.DAYS);
+        String pastDate = dtf.format(past);
+        int pastYear = Integer.parseInt(pastDate.split("-")[0]);
+        int pastMonth = Integer.parseInt(pastDate.split("-")[1]);
+        int pastDay = Integer.parseInt(pastDate.split("-")[2]);
         
         prepareDate(combobox_toMonth, selectedMonth);
         changeDay(combobox_toMonth, combobox_toDay, combobox_toYear, selectedDay, selectedYear);
+        prepareDate(combobox_fromMonth, pastMonth);
+        changeDay(combobox_fromMonth, combobox_fromDay, combobox_fromYear, pastDay, pastYear);
     }
     private void prepareDate(JComboBox monthCombo,int monthIndex)
     {
@@ -143,7 +159,7 @@ public class SalesDialog extends javax.swing.JDialog {
         DB_Transaction tDb = new DB_Transaction();
         
         String fromDate = combobox_fromYear.getSelectedItem() + "-" + twoDigits(combobox_fromMonth.getSelectedIndex() + 1) + "-" + twoDigits(combobox_fromDay.getSelectedIndex() + 1);
-        String toDate = combobox_toYear.getSelectedItem() + "-" + twoDigits(combobox_toMonth.getSelectedIndex() + 1) + "-" + twoDigits(combobox_toDay.getSelectedIndex() + 2);
+        String toDate = combobox_toYear.getSelectedItem() + "-" + twoDigits(combobox_toMonth.getSelectedIndex() + 1) + "-" + twoDigits(combobox_toDay.getSelectedIndex() + 1);
         
         transactions = tDb.processData(fromDate, toDate);
         ArrayList<String> idLists = tDb.getIdList();
@@ -204,10 +220,12 @@ public class SalesDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        btn_salesMonthly = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         label_sales = new javax.swing.JLabel();
-        button_salesReport = new javax.swing.JButton();
+        btn_salesCustom = new javax.swing.JButton();
+        btn_salesWeekly = new javax.swing.JButton();
+        btn_salesDaily = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -276,41 +294,37 @@ public class SalesDialog extends javax.swing.JDialog {
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel6.setText("/");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        btn_salesMonthly.setText("Generate Monthly Sales Report");
+        btn_salesMonthly.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_salesMonthlyActionPerformed(evt);
+            }
+        });
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel7.setText("Sales");
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel7.setText("Total Sales:");
 
         label_sales.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         label_sales.setText("0.0");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(label_sales)))
-                .addContainerGap(501, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(label_sales)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        button_salesReport.setText("Make Daily Sales Report");
-        button_salesReport.addActionListener(new java.awt.event.ActionListener() {
+        btn_salesCustom.setText("Generate Custom Sales Report");
+        btn_salesCustom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button_salesReportActionPerformed(evt);
+                btn_salesCustomActionPerformed(evt);
+            }
+        });
+
+        btn_salesWeekly.setText("Generate Weekly Sales Report");
+        btn_salesWeekly.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_salesWeeklyActionPerformed(evt);
+            }
+        });
+
+        btn_salesDaily.setText("Generate Daily Sales Report");
+        btn_salesDaily.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_salesDailyActionPerformed(evt);
             }
         });
 
@@ -322,74 +336,93 @@ public class SalesDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 683, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btn_salesMonthly, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btn_salesCustom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                            .addComponent(btn_salesWeekly, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btn_salesDaily, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(combobox_fromMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(combobox_toMonth, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(5, 5, 5)
-                                .addComponent(jLabel3))
-                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel7)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4)))
-                        .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(combobox_toDay, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(combobox_fromDay, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(label_sales))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addComponent(jLabel6))
-                            .addComponent(jLabel5))
-                        .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(combobox_fromYear, 0, 73, Short.MAX_VALUE)
-                            .addComponent(combobox_toYear, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(button_salesReport)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(combobox_fromMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(combobox_toMonth, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 13, Short.MAX_VALUE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(combobox_toDay, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(combobox_fromDay, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(1, 1, 1)
+                                        .addComponent(jLabel6))
+                                    .addComponent(jLabel5))
+                                .addGap(6, 6, 6)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(combobox_fromYear, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(combobox_toYear, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(23, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
                             .addComponent(combobox_fromMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(combobox_fromDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(combobox_fromYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
-                            .addComponent(combobox_toMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(combobox_toMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel3)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(combobox_fromDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(combobox_fromYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(combobox_toDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(combobox_toYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(button_salesReport)))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addComponent(combobox_toYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(28, 28, 28))
-                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_salesDaily, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_salesWeekly, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_salesMonthly, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_salesCustom, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(label_sales))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -431,13 +464,163 @@ public class SalesDialog extends javax.swing.JDialog {
             prepareTable();
     }//GEN-LAST:event_combobox_toYearActionPerformed
 
-    private void button_salesReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_salesReportActionPerformed
+    private void btn_salesMonthlyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_salesMonthlyActionPerformed
+       createMonthlySalesReport();
+    }//GEN-LAST:event_btn_salesMonthlyActionPerformed
+
+    private void btn_salesCustomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_salesCustomActionPerformed
+        createSalesReportByDate("custom", false);
+    }//GEN-LAST:event_btn_salesCustomActionPerformed
+
+    private void btn_salesWeeklyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_salesWeeklyActionPerformed
+        createWeeklySalesReport();
+    }//GEN-LAST:event_btn_salesWeeklyActionPerformed
+
+    private void btn_salesDailyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_salesDailyActionPerformed
+        createDailySalesReport();
+    }//GEN-LAST:event_btn_salesDailyActionPerformed
+    
+    private void createDailySalesReport(){
+        createSalesReportByDate("daily", true);
+    }
+
+    private void createWeeklySalesReport(){
+        createSalesReportByDate("weekly", true);
+    }
+
+    private void createMonthlySalesReport(){
+        createSalesReportByDate("monthly", true);
+    }
+            
+    private void createSalesReportByDate(String keyword, boolean withInventory){
+        if(table_transactions.getRowCount() >= 0){
+            Thread t = new Thread(() -> {
+                DB_Transaction dB_Transaction = new DB_Transaction();
+
+                try{
+
+                    String date = combobox_fromMonth.getSelectedItem().toString() + " " + 
+                            combobox_fromDay.getSelectedItem().toString() + ", " +
+                            combobox_fromYear.getSelectedItem().toString() + " - " +
+                            combobox_toMonth.getSelectedItem().toString() + " " + 
+                            combobox_toDay.getSelectedItem().toString() + ", " +
+                            combobox_toYear.getSelectedItem().toString();
+
+                    String reportPath = System.getProperty("user.dir") + "\\DailyReport.jrxml";
+
+                    Map<String, Object> parameters = new HashMap<>();
+                    parameters.put("logo", getClass().getResource("/Images/logo_h2.png"));//needs to change for flexibility
+                    parameters.put("date", date);
+
+                    String year = combobox_fromYear.getSelectedItem().toString();
+                    int initialMonth = combobox_fromMonth.getSelectedIndex() + 1;
+                    String month = initialMonth > 9 ? initialMonth + "" : "0" + initialMonth;
+                    int initialDay = Integer.parseInt(combobox_fromDay.getSelectedItem().toString());
+                    String day = initialDay > 9 ? initialDay + "" : "0" + initialDay;
+
+                    String fromDate =  year + "-" + month + "-" + day;
+
+                    year = combobox_toYear.getSelectedItem().toString();
+                    initialMonth = combobox_toMonth.getSelectedIndex() + 1;
+                    month = initialMonth > 9 ? initialMonth + "" : "0" + initialMonth;
+                    initialDay = Integer.parseInt(combobox_toDay.getSelectedItem().toString());
+                    day = initialDay > 9 ? initialDay + "" : "0" + initialDay;
+
+                    String toDate =  year + "-" + month + "-" + day;
+
+                    String totalSales = (char)8369 + " " + new DecimalFormat().format(Double.parseDouble(dB_Transaction.getTotalSales(fromDate, toDate)));
+                    String totalItemsSold = dB_Transaction.getTotalItemsSold(fromDate, toDate) + " Item/s";
+                    String totalTransactions = dB_Transaction.getTotalTransactions(fromDate, toDate) + " Transaction/s";
+                    String averageAmountPerTransactions = (char)8369 + " " + new DecimalFormat().format(Double.parseDouble(dB_Transaction.getAverageAmountPerTransactions(fromDate, toDate)));
+                    String mostSoldItemRate = dB_Transaction.getMostSoldItemRate(fromDate, toDate);
+                    String leastSoldItemRate = dB_Transaction.getLeastSoldItemRate(fromDate, toDate);
+
+                    String mostSalesClerk = dB_Transaction.getMostSalesClerk(fromDate, toDate);
+
+                    parameters.put("totalSales", totalSales);
+                    parameters.put("totalItemsSold", totalItemsSold);
+                    parameters.put("totalTransactions", totalTransactions);
+                    parameters.put("averageAmountPerTransactions", averageAmountPerTransactions);
+                    parameters.put("mostSoldItemRate", mostSoldItemRate);
+                    parameters.put("leastSoldItemRate", leastSoldItemRate);
+
+                    parameters.put("mostSalesClerk", mostSalesClerk);
+
+                    parameters.put("hasInventoryStatus", withInventory);
+
+                    List<ChartData> cList = new ArrayList<>();
+                    
+                    List<InventoryObject> collectionList = new ArrayList<>();//create a new list for inventory, but planning to keep inventory status separate
+                    if(withInventory){
+                        if(toDate.equals(LocalDate.now().toString()) || toDate.equals(LocalDate.now().minus(1, ChronoUnit.DAYS).toString())){
+                            collectionList = dB_Transaction.getInventory(toDate, keyword);
+                        }else{
+                            MessageHandler mh = new MessageHandler();
+                            mh.warning("Unable to create inventory report! To Date should be current date!");
+                        }
+                    }
+                    for(int i = 0; i < collectionList.size(); i++){
+                        System.out.println(collectionList.get(i).getName() + " " + i);
+                    }
+                    JRBeanCollectionDataSource itemsJRBean = new JRBeanCollectionDataSource(collectionList);
+                    parameters.put("CollectionBeanParam", itemsJRBean);
+                    
+                    if(keyword.equals("custom")){
+                        cList = dB_Transaction.getChartDataSalesByDate(fromDate, toDate);
+                    }else if(keyword.equals("daily")){
+                        cList = dB_Transaction.getChartDataSalesDaily(toDate);
+                    }else if(keyword.equals("weekly")){
+                        cList = dB_Transaction.getChartDataSalesWeekly(toDate);
+                    }else if(keyword.equals("monthly")){
+                        cList = dB_Transaction.getChartDataSalesMonthly(toDate);
+                    }
+
+                    parameters.put("ChartData", new JRBeanCollectionDataSource(cList));
+
+                    InputStream input = new FileInputStream(new File(reportPath));
+                    JasperDesign jdesign = JRXmlLoader.load(input);
+
+                    JasperReport jreport = JasperCompileManager.compileReport(jdesign);
+                    JasperPrint jprint = JasperFillManager.fillReport(jreport, parameters, new JREmptyDataSource());
+
+                    JasperViewer.viewReport(jprint, false);
+                }catch(Exception ex)
+                {
+                    JOptionPane.showMessageDialog(null, ex);
+                }
+            });
+            t.start();
+            while(t.isAlive()){
+
+            }
+            new MessageHandler().message("Sales Report created!");
+            dispose();
+        }
+    }
+    private ArrayList<ChartData> getChartData(String fromDate, String toDate){
+        ArrayList<ChartData> cList = new ArrayList<>();
+        cList.add(new ChartData("Sample 1", "cat 1", 5.0));
+        cList.add(new ChartData("Sample 1", "cat 2", 7.0));
+        cList.add(new ChartData("Sample 1", "cat 3", 9.0));
+        cList.add(new ChartData("Sample 2", "cat 1", 10.0));
+        cList.add(new ChartData("Sample 2", "cat 2", 8.0));
+        cList.add(new ChartData("Sample 2", "cat 3", 6.0));
+        cList.add(new ChartData("Sample 3", "cat 1", 10.0));
+        cList.add(new ChartData("Sample 3", "cat 2", 5.0));
+        cList.add(new ChartData("Sample 3", "cat 3", 0.0));
+        cList.add(new ChartData("Sample 4", "cat 1", 1.0));
+        cList.add(new ChartData("Sample 4", "cat 2", 3.0));
+        cList.add(new ChartData("Sample 4", "cat 3", 5.7));
         
-    }//GEN-LAST:event_button_salesReportActionPerformed
-
-
+        
+        
+        return cList;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton button_salesReport;
+    private javax.swing.JButton btn_salesCustom;
+    private javax.swing.JButton btn_salesDaily;
+    private javax.swing.JButton btn_salesMonthly;
+    private javax.swing.JButton btn_salesWeekly;
     private javax.swing.JComboBox<String> combobox_fromDay;
     private javax.swing.JComboBox<String> combobox_fromMonth;
     private javax.swing.JComboBox<String> combobox_fromYear;
@@ -451,7 +634,6 @@ public class SalesDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label_sales;
     private javax.swing.JTable table_transactions;

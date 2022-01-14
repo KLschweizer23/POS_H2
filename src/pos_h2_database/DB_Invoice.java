@@ -31,7 +31,6 @@ public class DB_Invoice {
         String[] keys = {"tables"};
         
         String query = dbf.getTables(con.getSchemaName(), keys[0]) + dbf.and() + "TABLE_NAME " + dbf.like(tablePrefix);
-        System.out.println(query);
         HashMap<String, ArrayList> map = dbf.customReturnQuery(query, keys);
         
         ArrayList<String> listOfTables = new ArrayList<>();
@@ -87,7 +86,7 @@ public class DB_Invoice {
     public void newCustomer(String customerName)
     {
         DatabaseFunctions dbf = new DatabaseFunctions();
-        dbf.createTable(tablePrefix + customerName, columnToKeys(true));
+        dbf.createTable(tablePrefix + fillSpaces("_", customerName), columnToKeys(true));
     }
     
     public void deleteCustomer(String customerName)
@@ -208,4 +207,29 @@ public class DB_Invoice {
     public ArrayList<String> getIdList() {
         return idList;
     }
+    private String fillSpaces(String character, String string)
+    {
+        return string.replace(" ", character);
+    }
+    
+    public Double getInvoicedItemById(String id, String currentDate){
+        DatabaseFunctions df = new DatabaseFunctions();
+        ArrayList<String> tables = new ArrayList<>();
+        
+        Double counts = 0.0;
+        for(int i = 0; i < tables.size(); i++){
+            String myQuery = "SELECT SUM(" + I_QUANTITY + ") as sum FROM " + tables.get(i) + " WHERE " + I_ID + " = " + id + " AND " + DATE + " >= '" + currentDate + "' AND " + DATE + " <= '" + currentDate + "'";
+            String[] keys = {"sum"};
+            
+            HashMap<String, ArrayList> map = df.customReturnQuery(myQuery, keys);
+            ArrayList<String> data = map.get("sum");
+            
+            if(data.get(0) == null)
+                continue;
+            counts += Double.parseDouble(data.get(0));
+        }
+        
+        return counts;
+    }
+    
 }

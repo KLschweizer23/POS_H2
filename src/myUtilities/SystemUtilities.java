@@ -2,6 +2,10 @@ package myUtilities;
 
 import java.awt.Component;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
@@ -138,6 +142,14 @@ public class SystemUtilities
     {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     }
+    public String getCurrentDate()
+    {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+    public String getCurrentDateTime(String format)
+    {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(format));
+    }
     
     //---------------------------- TABLE FUNCTIONS------------------------\\
     public void resizeColumnWidth(JTable table) 
@@ -157,7 +169,31 @@ public class SystemUtilities
             columnModel.getColumn(column).setPreferredWidth(width);
         }
     }
-    
+    public void setHoverableTable(JTable table)
+    {        
+        table.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                int y = p.y / table.getRowHeight();
+                if(y < table.getModel().getRowCount())
+                    table.setRowSelectionInterval(0, y);
+            }
+        });
+    }
+    public void setSelectionToZero(JTable table, boolean toZero)
+    {
+        if(toZero && table.getRowCount() > 0) table.setRowSelectionInterval(0, 0);
+    }
+    public void setCustomSelection(JTable table, int selection)
+    {
+        if(table.getRowCount() > 0) table.setRowSelectionInterval(0, selection);
+    }
     //---------------------------- FILE FUNCTIONS ------------------------\\
     public String getSingleStringFromFile(File file)
     {

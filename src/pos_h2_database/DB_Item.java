@@ -1,5 +1,7 @@
 package pos_h2_database;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import myUtilities.DatabaseFunctions;
@@ -112,5 +114,80 @@ public class DB_Item {
     
     public ArrayList<String> getIdList() {
         return idList;
+    }
+    
+    public ArrayList<String> getAllIdList(){
+        ArrayList<String> idList = new ArrayList<>();
+        
+        DatabaseFunctions df = new DatabaseFunctions();
+        String myQuery = "SELECT " + ID + " FROM " + table;
+        String[] keys = {ID};
+        
+        HashMap<String, ArrayList> data = df.customReturnQuery(myQuery, keys);
+        ArrayList<String> clerkList = data.get(ID);
+        if(clerkList.get(0) == null || clerkList.size() <= 0)
+            return idList;
+        idList = clerkList;
+        
+        return idList;
+    }
+    
+    public String getNameById(String id){
+        DatabaseFunctions df = new DatabaseFunctions();
+        String myQuery = "SELECT " + NAME + " FROM " + table + " WHERE " + ID + " = " + id;
+        String[] keys = {NAME};
+        
+        HashMap<String, ArrayList> data = df.customReturnQuery(myQuery, keys);
+        ArrayList<String> dataList = data.get(NAME);
+        if(dataList.get(0) == null || dataList.size() <= 0)
+            return null;
+        return dataList.get(0);
+    }
+    
+    public String getBrandById(String id){
+        DatabaseFunctions df = new DatabaseFunctions();
+        String myQuery = "SELECT " + BRAND + " FROM " + table + " WHERE " + ID + " = " + id;
+        String[] keys = {BRAND};
+        
+        HashMap<String, ArrayList> data = df.customReturnQuery(myQuery, keys);
+        ArrayList<String> dataList = data.get(BRAND);
+        if(dataList.get(0) == null || dataList.size() <= 0)
+            return null;
+        return dataList.get(0);
+    }
+    
+    public String getArticleById(String id){
+        DatabaseFunctions df = new DatabaseFunctions();
+        String myQuery = "SELECT " + ARTICLE + " FROM " + table + " WHERE " + ID + " = " + id;
+        String[] keys = {ARTICLE};
+        
+        HashMap<String, ArrayList> data = df.customReturnQuery(myQuery, keys);
+        ArrayList<String> dataList = data.get(ARTICLE);
+        if(dataList.get(0) == null || dataList.size() <= 0)
+            return null;
+        return dataList.get(0);
+    }
+    
+    public Double getLeftById(String id, String currentDate, boolean isYesterday){
+        DatabaseFunctions df = new DatabaseFunctions();
+        DB_Transaction db_transaction = new DB_Transaction();
+        
+        LocalDate date = LocalDate.parse(currentDate);
+        
+        String myQuery = "SELECT " + QUANTITY + " FROM " + table + " WHERE " + ID + " = " + id;
+        String[] keys = {QUANTITY};
+        
+        Double result = 0.0;
+        HashMap<String, ArrayList> data = df.customReturnQuery(myQuery, keys);
+        ArrayList<String> dataList = data.get(QUANTITY);
+        if(dataList.get(0) == null || dataList.size() <= 0)
+            return 0.0;
+        result = Double.parseDouble(dataList.get(0));
+        
+        if(isYesterday){
+            Double sold = db_transaction.getSoldById(id, date.plus(1, ChronoUnit.DAYS).toString());
+            result += sold;
+        }
+        return result;
     }
 }
