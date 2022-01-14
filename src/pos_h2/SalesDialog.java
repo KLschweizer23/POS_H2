@@ -35,6 +35,7 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import static pos_h2.MainFrame.myFrame;
+import pos_h2_database.DB_Invoice;
 import pos_h2_database.DB_Transaction;
 import pos_h2_database.Item;
 import pos_h2_database.Transaction;
@@ -485,11 +486,11 @@ public class SalesDialog extends javax.swing.JDialog {
     }
 
     private void createWeeklySalesReport(){
-        createSalesReportByDate("weekly", true);
+        createSalesReportByDate("weekly", false);
     }
 
     private void createMonthlySalesReport(){
-        createSalesReportByDate("monthly", true);
+        createSalesReportByDate("monthly", false);
     }
             
     private void createSalesReportByDate(String keyword, boolean withInventory){
@@ -510,7 +511,6 @@ public class SalesDialog extends javax.swing.JDialog {
 
                     Map<String, Object> parameters = new HashMap<>();
                     parameters.put("logo", getClass().getResource("/Images/logo_h2.png"));//needs to change for flexibility
-                    parameters.put("date", date);
 
                     String year = combobox_fromYear.getSelectedItem().toString();
                     int initialMonth = combobox_fromMonth.getSelectedIndex() + 1;
@@ -528,16 +528,33 @@ public class SalesDialog extends javax.swing.JDialog {
 
                     String toDate =  year + "-" + month + "-" + day;
 
-                    String totalSales = (char)8369 + " " + new DecimalFormat().format(Double.parseDouble(dB_Transaction.getTotalSales(fromDate, toDate)));
+                    if(keyword.equals("daily")){
+                        fromDate = toDate;
+                    }else if(keyword.equals("weekly")){
+                        fromDate = LocalDate.parse(toDate).minus(6, ChronoUnit.DAYS).toString();
+                    }else if(keyword.equals("monthly")){
+                        LocalDate currentDate = LocalDate.parse(toDate);
+                        LocalDate firstMonthDate = currentDate.withDayOfMonth(1);
+                        LocalDate lastMonthDate = currentDate.withDayOfMonth(currentDate.lengthOfMonth());
+                        fromDate = firstMonthDate.toString();
+                        toDate = lastMonthDate.toString();
+                    }
+                    Double invoiceSales = new DB_Invoice().getTotalInvoiceSales(fromDate, toDate);
+                    Double sales = Double.parseDouble(dB_Transaction.getTotalSales(fromDate, toDate));
+                    
+                    String totalSales = (char)8369 + " " + new DecimalFormat("###,###,##0.00").format(sales);
                     String totalItemsSold = dB_Transaction.getTotalItemsSold(fromDate, toDate) + " Item/s";
                     String totalTransactions = dB_Transaction.getTotalTransactions(fromDate, toDate) + " Transaction/s";
-                    String averageAmountPerTransactions = (char)8369 + " " + new DecimalFormat().format(Double.parseDouble(dB_Transaction.getAverageAmountPerTransactions(fromDate, toDate)));
+                    String averageAmountPerTransactions = (char)8369 + " " + new DecimalFormat("###,###,##0.00").format(Double.parseDouble(dB_Transaction.getAverageAmountPerTransactions(fromDate, toDate)));
                     String mostSoldItemRate = dB_Transaction.getMostSoldItemRate(fromDate, toDate);
                     String leastSoldItemRate = dB_Transaction.getLeastSoldItemRate(fromDate, toDate);
 
                     String mostSalesClerk = dB_Transaction.getMostSalesClerk(fromDate, toDate);
-
+                    
+                    String invoiceMessage = invoiceSales <= 0 ? "" : " + " + (char)8369 + " " + new DecimalFormat("###,###,##0.00").format(invoiceSales) + " invoice sales!";
+                    parameters.put("date", LocalDate.parse(fromDate).format(DateTimeFormatter.ofPattern("MMM dd, yyyy")) + "-" + LocalDate.parse(toDate).format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
                     parameters.put("totalSales", totalSales);
+                    parameters.put("invoiceSales", invoiceMessage);
                     parameters.put("totalItemsSold", totalItemsSold);
                     parameters.put("totalTransactions", totalTransactions);
                     parameters.put("averageAmountPerTransactions", averageAmountPerTransactions);
@@ -596,25 +613,6 @@ public class SalesDialog extends javax.swing.JDialog {
             new MessageHandler().message("Sales Report created!");
             dispose();
         }
-    }
-    private ArrayList<ChartData> getChartData(String fromDate, String toDate){
-        ArrayList<ChartData> cList = new ArrayList<>();
-        cList.add(new ChartData("Sample 1", "cat 1", 5.0));
-        cList.add(new ChartData("Sample 1", "cat 2", 7.0));
-        cList.add(new ChartData("Sample 1", "cat 3", 9.0));
-        cList.add(new ChartData("Sample 2", "cat 1", 10.0));
-        cList.add(new ChartData("Sample 2", "cat 2", 8.0));
-        cList.add(new ChartData("Sample 2", "cat 3", 6.0));
-        cList.add(new ChartData("Sample 3", "cat 1", 10.0));
-        cList.add(new ChartData("Sample 3", "cat 2", 5.0));
-        cList.add(new ChartData("Sample 3", "cat 3", 0.0));
-        cList.add(new ChartData("Sample 4", "cat 1", 1.0));
-        cList.add(new ChartData("Sample 4", "cat 2", 3.0));
-        cList.add(new ChartData("Sample 4", "cat 3", 5.7));
-        
-        
-        
-        return cList;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_salesCustom;

@@ -512,6 +512,7 @@ public class MainFrame extends javax.swing.JFrame {
                     cancelTransaction();
                     updateHistory();
                     processTable();
+                    table_display.requestFocus();
                 } else mh.warning("Invalid payment!");
             } else mh.warning("There are no items to buy!");
         } else mh.warning("There are no sales clerk!");

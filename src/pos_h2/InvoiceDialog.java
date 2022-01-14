@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JTable;
@@ -193,7 +194,6 @@ private void setupTable(JTable table, DefaultTableModel dtm)
         DB_Invoice invoiceDb = new DB_Invoice();
         
         String invoiceName = table_tables.getValueAt(table_tables.getSelectedRow(), 0).toString();
-        
         invoices = invoiceDb.processData(invoiceName, !checkbox_unpaidOnly.isSelected());
         idList = invoiceDb.getIdList();
         
@@ -224,6 +224,7 @@ private void setupTable(JTable table, DefaultTableModel dtm)
             String id = table_invoices.getValueAt(table_invoices.getSelectedRow(), 0).toString();
             Invoice invoice = invoices.get(id);
             ArrayList<Item> items = invoice.getItem();
+            System.out.println(items);
             for(Item item : items)
             {
                 String[] rowData =
@@ -458,7 +459,7 @@ private void setupTable(JTable table, DefaultTableModel dtm)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(label_totalInvoice, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
+                                .addComponent(label_totalInvoice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(checkbox_unpaidOnly))
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(button_newInvoice)
@@ -574,6 +575,7 @@ private void setupTable(JTable table, DefaultTableModel dtm)
                 String id = table_invoices.getValueAt(table_invoices.getSelectedRow(), 0).toString();
                 
                 Invoice invoice = invoices.get(id);
+                invoice.setDate(LocalDate.now().toString());
                 invoice.setStatus("Paid");
                 
                 invoiceDb.updateInvoice(table_tables.getValueAt(table_tables.getSelectedRow(), 0).toString(), invoice);
@@ -617,7 +619,7 @@ private void setupTable(JTable table, DefaultTableModel dtm)
             Item item = new Item();
             
             invoice.setId_invoice(newId);
-            invoice.setDate(su.getCurrentDateTime());
+            invoice.setDate(LocalDate.now().toString());
             invoice.setStatus("Unpaid");
             list.add(item);
             invoice.setItem(list);
@@ -638,8 +640,6 @@ private void setupTable(JTable table, DefaultTableModel dtm)
     
     public void addItem(Item item)
     {
-        SystemUtilities su = new SystemUtilities();
-        
         int quantityToBuy = Integer.parseInt(item.getQuantityToBuy());
         int quantityLeft = Integer.parseInt(item.getQuantity()) - quantityToBuy;
         
@@ -648,7 +648,7 @@ private void setupTable(JTable table, DefaultTableModel dtm)
         item.setQuantity(quantityToBuy + "");
         Invoice invoice = new Invoice();
         invoice.setId_invoice(table_invoices.getValueAt(table_invoices.getSelectedRow(), 0).toString());
-        invoice.setDate(su.getCurrentDateTime());
+        invoice.setDate(LocalDate.now().toString());
         invoice.setStatus("Unpaid");
         
         ArrayList<Item> theItem = new ArrayList<>();

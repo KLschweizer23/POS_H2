@@ -290,7 +290,7 @@ public class DB_Transaction {
         String[] seriesName = {"Sales", "Transaction", "Items Sold", "Avg. Sales/Transactions"};
         for(int i = 0; i < seriesName.length; i++){
             String date = "";
-            for(int j = 1; !date.equals(toDate_main.plus(1, ChronoUnit.DAYS).toString()); j++){
+            for(int j = 1; !date.equals(toDate_main.toString()); j++){
                 LocalDate dayDate = fromDate_main.plus(j - 1, ChronoUnit.DAYS);
                 date = dayDate.toString();
                 System.out.println(date);
@@ -420,6 +420,7 @@ public class DB_Transaction {
     public ArrayList<InventoryObject> getInventory(String currentDate, String keyword){
         DB_Item db_item = new DB_Item();
         DB_Invoice db_invoice = new DB_Invoice();
+        DB_TransferStocks db_transferStocks = new DB_TransferStocks();
         
         ArrayList<InventoryObject> iList = new ArrayList<>();
         ArrayList<String> idList = db_item.getAllIdList();
@@ -433,20 +434,16 @@ public class DB_Transaction {
                 System.out.println(currentId);
                 if(db_item.getNameById(currentId) == null)
                     continue;
+                
                 io.setName(db_item.getNameById(currentId));
                 io.setBrand(db_item.getBrandById(currentId));
                 io.setArticle(db_item.getArticleById(currentId));
-                if(date.toString().equals(LocalDate.now().toString())){//if the chosen date is actually this current date
-                    io.setLeft(db_item.getLeftById(currentId, date.toString(), false));
-                    io.setSold(getSoldById(currentId, date.toString()));
-                    io.setInvoiced(db_invoice.getInvoicedItemById(currentId, currentDate));
-                    //io.setTransfer();
-                }else if(date.toString().equals(LocalDate.now().minus(1, ChronoUnit.DAYS).toString())){//if the chosen date is yesterday
-                    io.setLeft(db_item.getLeftById(currentId, date.toString(), true));
-                    io.setSold(getSoldById(currentId, date.minus(1, ChronoUnit.DAYS).toString()));
-                    io.setInvoiced(db_invoice.getInvoicedItemById(currentId, date.minus(1, ChronoUnit.DAYS).toString()));
-                    //io.setTransfer();
-                }
+                
+                io.setLeft(db_item.getLeftById(currentId, date.toString(), date.toString().equals(LocalDate.now().minus(1, ChronoUnit.DAYS).toString())));
+                
+                io.setSold(getSoldById(currentId, date.toString()));
+                io.setInvoiced(db_invoice.getInvoicedItemById(currentId, date.toString()));
+                io.setTransfer(db_transferStocks.getTransfferedStockById(currentId, date.toString()));
                 iList.add(io);
             }
             System.out.println("end");

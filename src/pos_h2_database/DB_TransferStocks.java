@@ -88,4 +88,18 @@ public class DB_TransferStocks {
         return Integer.parseInt(data.get(0)) + 1;
     }
     
+    public double getTransfferedStockById(String id, String currentDate){
+        DatabaseFunctions df = new DatabaseFunctions();
+        String myQuery = "SELECT SUM(" + I_QUANTITY + ") as total FROM " + table + " WHERE " + DATE + " >= '" + currentDate + "' AND " + DATE + " <= '" + currentDate + "' AND " + I_ID + " = " + id;
+        String[] keys = {"total"};
+        
+        HashMap<String, ArrayList> map = df.customReturnQuery(myQuery, keys);
+        ArrayList<String> data = map.get("total");
+        
+        if(data.get(0) == null)
+            return 0.0;
+        
+        return Double.parseDouble(data.get(0));
+    }
+    
 }

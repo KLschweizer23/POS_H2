@@ -170,7 +170,10 @@ public class DB_Item {
     
     public Double getLeftById(String id, String currentDate, boolean isYesterday){
         DatabaseFunctions df = new DatabaseFunctions();
+        
         DB_Transaction db_transaction = new DB_Transaction();
+        DB_Invoice db_invoice = new DB_Invoice();
+        DB_TransferStocks db_transferStocks = new DB_TransferStocks();
         
         LocalDate date = LocalDate.parse(currentDate);
         
@@ -182,11 +185,15 @@ public class DB_Item {
         ArrayList<String> dataList = data.get(QUANTITY);
         if(dataList.get(0) == null || dataList.size() <= 0)
             return 0.0;
-        result = Double.parseDouble(dataList.get(0));
         
+        result = Double.parseDouble(dataList.get(0));
         if(isYesterday){
-            Double sold = db_transaction.getSoldById(id, date.plus(1, ChronoUnit.DAYS).toString());
-            result += sold;
+            String dateToVoidItem = date.plus(1, ChronoUnit.DAYS).toString();
+            Double sold = db_transaction.getSoldById(id, dateToVoidItem);
+            Double invoiced = db_invoice.getInvoicedItemById(id, dateToVoidItem);
+            Double transferred = db_transferStocks.getTransfferedStockById(id, dateToVoidItem);
+            
+            result += sold + invoiced + transferred;
         }
         return result;
     }

@@ -48,7 +48,7 @@ public class DB_Invoice {
         
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
-        String query = dbf.selectAll() + dbf.from(tablePrefix + invoiceName) + dbf.whereEquals(STATUS, getUnpaid ? "Paid" : "Unpaid");
+        String query = dbf.selectAll() + dbf.from(tablePrefix + invoiceName) + dbf.whereEquals(STATUS, getUnpaid ? "Paid" : "Unpaid") + " ORDER BY " + ID_INVOICE;
         
         HashMap<String, ArrayList> map = dbf.customReturnQuery(query, keys);
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size());)
@@ -61,10 +61,9 @@ public class DB_Invoice {
             invoiceObj.setDate(map.get(DATE).get(i).toString());
             invoiceObj.setStatus(map.get(STATUS).get(i).toString());
             ArrayList<Item> listOfItems = new ArrayList<>();
-            System.out.println(map.get(I_NAME).get(i).toString());
             i++;
             while(i < map.get(ID).size() && map.get(ID_INVOICE).get(i - 1).toString().equals(map.get(ID_INVOICE).get(i).toString()))
-            {            
+            {
                 Item item = new Item();
                 item.setId(map.get(ID).get(i).toString());
                 item.setName(map.get(I_NAME).get(i).toString());
@@ -214,11 +213,11 @@ public class DB_Invoice {
     
     public Double getInvoicedItemById(String id, String currentDate){
         DatabaseFunctions df = new DatabaseFunctions();
-        ArrayList<String> tables = new ArrayList<>();
+        ArrayList<String> tables = getTables();
         
         Double counts = 0.0;
         for(int i = 0; i < tables.size(); i++){
-            String myQuery = "SELECT SUM(" + I_QUANTITY + ") as sum FROM " + tables.get(i) + " WHERE " + I_ID + " = " + id + " AND " + DATE + " >= '" + currentDate + "' AND " + DATE + " <= '" + currentDate + "'";
+            String myQuery = "SELECT SUM(" + I_QUANTITY + ") as sum FROM " + tablePrefix + tables.get(i) + " WHERE " + I_ID + " = " + id + " AND " + DATE + " >= '" + currentDate + "' AND " + DATE + " <= '" + currentDate + "'";
             String[] keys = {"sum"};
             
             HashMap<String, ArrayList> map = df.customReturnQuery(myQuery, keys);
@@ -230,6 +229,25 @@ public class DB_Invoice {
         }
         
         return counts;
+    }
+    
+    public Double getTotalInvoiceSales(String fromDate, String toDate){
+        DatabaseFunctions df = new DatabaseFunctions();
+        ArrayList<String> tables = getTables();
+        
+        Double total = 0.0;
+        for(int i = 0; i < tables.size(); i++){
+            String myQuery = "SELECT SUM(" + I_QUANTITY + " * " + I_PRICE + ") as total FROM " + tablePrefix + tables.get(i) + " WHERE " + DATE + " >= '" + fromDate + "' AND " + DATE + " <= '" + toDate + "' AND " + STATUS + " = 'Paid'";
+            String[] keys = {"total"};
+            
+            HashMap<String, ArrayList> map = df.customReturnQuery(myQuery, keys);
+            ArrayList<String> data = map.get("total");
+            
+            if(data.get(0) == null)
+                continue;
+            total += Double.parseDouble(data.get(0));
+        }
+        return total;
     }
     
 }
