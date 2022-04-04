@@ -35,7 +35,11 @@ public class DB_Item {
         DatabaseFunctions dbf = new DatabaseFunctions();
         String[] keys = columnToKeys(false);
         
-        HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, NAME, true);
+        //HashMap<String, ArrayList> map = dbf.selectAllData(table, keys, keyword, colIndex, NAME, true);
+        HashMap<String, ArrayList> map = dbf.customReturnQuery(
+                "SELECT * FROM " + table + " WHERE " + NAME + " LIKE '%" + keyword + "%' OR " + BRAND + " LIKE '%" + keyword + "%' ORDER BY " + NAME + ", " + BRAND + " ASC ",
+                keys
+        );
         for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++)
         {
             Item itemObject = new Item();

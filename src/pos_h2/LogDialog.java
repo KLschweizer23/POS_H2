@@ -53,7 +53,7 @@ public class LogDialog extends javax.swing.JDialog {
         HashMap<String, Log> logs = loginDb.processData("", 0);
         ArrayList<String> idLists = loginDb.getIdList();
         
-        for(int i = 0; i < idLists.size(); i++)
+        for(int i = idLists.size() - 1; i >= 0; i--)
         {
             String id = idLists.get(i);
             String[] rowData =
@@ -65,6 +65,7 @@ public class LogDialog extends javax.swing.JDialog {
             };
             dtm.addRow(rowData);
         }
+        
         if(table_logs.getRowCount() > 0)
             table_logs.setRowSelectionInterval(0, 0);
         

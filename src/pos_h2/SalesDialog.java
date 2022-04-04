@@ -167,7 +167,7 @@ public class SalesDialog extends javax.swing.JDialog {
         for(int i = idLists.size() - 1; i >= 0; i--)
         {
             Transaction trans = transactions.get(idLists.get(i));
-            double currentTotal = getTotalAmount(trans.getItem());
+            double currentTotal = Double.parseDouble(trans.getTotalAmount());
             totalAmount += currentTotal;
             String[] rowData = {
                 trans.getT_id(),

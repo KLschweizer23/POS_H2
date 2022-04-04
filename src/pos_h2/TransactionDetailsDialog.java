@@ -2,9 +2,12 @@ package pos_h2;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
+import pos_h2_database.DB_Discount;
+import pos_h2_database.Discount;
 import pos_h2_database.Item;
 import pos_h2_database.Transaction;
 
@@ -40,12 +43,42 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
         String date = currentTransaction.getDate();
         String totalAmount = currentTransaction.getTotalAmount();
         String payment = currentTransaction.getPayment();
+        String discount = discount(salesClerk);
+        
+        salesClerk = getSalesClerkOnly(salesClerk);
         
         label_id.setText(id);
         label_salesClerk.setText(salesClerk);
         label_date.setText(date);
         label_totalAmount.setText((char)8369 + " " + totalAmount);
         label_payment.setText((char)8369 + " " + payment);
+        label_discount.setText(discount);
+    }
+    
+    private String discount(String clerkWithID){
+        String id = "";
+        for(int i = 0; i < clerkWithID.length(); i++){
+            if(clerkWithID.charAt(i) == '-'){
+                i += 1;
+                id = clerkWithID.substring(i);
+                
+                DB_Discount discountDb = new DB_Discount();
+                HashMap<String, Discount> map = discountDb.processData("", 0);
+                Discount discount = map.get(id);
+                return discount.getName() + ":" + discount.getValue() + "%";
+            }
+        }
+        
+        
+        return "";
+    }
+    
+    private String getSalesClerkOnly(String salesClerk){
+        for(int i = 0; i < salesClerk.length(); i++){
+            if(salesClerk.charAt(i) == '-')
+                return salesClerk.substring(0, i);
+        }
+        return salesClerk;
     }
     
     private void prepareTable()
@@ -101,6 +134,7 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
         label_salesClerk3 = new javax.swing.JLabel();
         label_salesClerk4 = new javax.swing.JLabel();
         label_id = new javax.swing.JLabel();
+        label_discount = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -181,6 +215,13 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
         label_id.setText("00");
         label_id.setFocusable(false);
 
+        label_discount.setBackground(new java.awt.Color(255, 255, 255));
+        label_discount.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        label_discount.setForeground(new java.awt.Color(0, 0, 0));
+        label_discount.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        label_discount.setText("Discount");
+        label_discount.setFocusable(false);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -192,7 +233,7 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
                         .addComponent(label_salesClerk)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(label_date)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 283, Short.MAX_VALUE)
                         .addComponent(label_id))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -208,7 +249,8 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
                                 .addComponent(label_salesClerk3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(label_payment)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(label_discount)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -228,7 +270,8 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(label_salesClerk4)
                     .addComponent(label_salesClerk3)
-                    .addComponent(label_payment))
+                    .addComponent(label_payment)
+                    .addComponent(label_discount))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -260,6 +303,7 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label_date;
+    private javax.swing.JLabel label_discount;
     private javax.swing.JLabel label_id;
     private javax.swing.JLabel label_payment;
     private javax.swing.JLabel label_salesClerk;
