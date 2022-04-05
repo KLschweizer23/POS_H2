@@ -21,12 +21,34 @@ public class DB_TransferStocks {
     private final String DATE = "DATE";
     private final String S_ID = "S_ID";
     
-    private HashMap<String, StockTransfer> stockTransfer = new HashMap<>();
+    private HashMap<String, StockTransfer> stockTransfers = new HashMap<>();
     private ArrayList<String> idList = new ArrayList<>();
     
     public DB_TransferStocks(){
         DatabaseFunctions dbf = new DatabaseFunctions();
         dbf.createTable(table, columnToKeys(true));
+    }
+    
+    public HashMap<String, StockTransfer> processData(String keyword, int colIndex){
+        stockTransfers.clear();
+        idList.clear();
+        
+        DatabaseFunctions dbf = new DatabaseFunctions();
+        String[] keys = {ID, TS_ID, DATE, "name"};
+        
+        String query = "SELECT t." + ID + ", t." + TS_ID + ", t." + DATE + ", s.NAME FROM " + table + " t, " + new DB_Store().table + " s WHERE " + "t." + S_ID + " = s." + ID + " GROUP BY " + TS_ID;
+        HashMap<String, ArrayList> map = dbf.customReturnQuery(query, keys);
+        for(int i = 0; i < (map.get(ID) == null ? 0 : map.get(ID).size()); i++){
+            StockTransfer st = new StockTransfer();
+            String id = map.get(TS_ID).get(i).toString();
+            
+            st.setId(id);
+            st.setDate(map.get(DATE).get(i).toString());
+            st.setStoreId(map.get("name").get(i).toString());
+            stockTransfers.put(id, st);
+            idList.add(id);
+        }
+        return stockTransfers;
     }
     
     public void insertData(StockTransfer stockTransfer){

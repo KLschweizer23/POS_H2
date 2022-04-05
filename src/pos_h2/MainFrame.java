@@ -659,6 +659,7 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator10 = new javax.swing.JPopupMenu.Separator();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jMenuItem8 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         menuItem_invoice = new javax.swing.JMenuItem();
         menuItem_sales = new javax.swing.JMenuItem();
@@ -1288,6 +1289,15 @@ public class MainFrame extends javax.swing.JFrame {
         });
         menu_database.add(jMenuItem6);
 
+        jMenuItem8.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem8.setText("View Transferred Stocks");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        menu_database.add(jMenuItem8);
+
         jMenuBar1.add(menu_database);
 
         jMenu3.setText("Others");
@@ -1480,6 +1490,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void comboBox_discountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBox_discountActionPerformed
         updateStatus();
     }//GEN-LAST:event_comboBox_discountActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        viewStocks();
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
     
     private double getDiscount(){
         if(comboBox_discount.getSelectedIndex() != 0){
@@ -1496,6 +1510,14 @@ public class MainFrame extends javax.swing.JFrame {
             return (discountValue / 100);
         }
         return 0;
+    }
+    
+    private void viewStocks(){
+        ViewTransferStockDialog viewTransfer = new ViewTransferStockDialog(this, true);
+        int x = (getWidth() - viewTransfer.getWidth()) / 2;
+        int y = (getHeight() - viewTransfer.getHeight()) / 2;
+        viewTransfer.setLocation(x,y);
+        viewTransfer.setVisible(true);
     }
     
     private void openStocksTransfer(){
@@ -1621,6 +1643,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;

@@ -10,7 +10,7 @@ import myUtilities.DatabaseFunctions;
  * @author KL_Schweizer
  */
 public class DB_Store {
-    private final String table = "table_store";
+    public final String table = "table_store";
     
     private final String ID = "ID";
     private final String NAME = "NAME";
