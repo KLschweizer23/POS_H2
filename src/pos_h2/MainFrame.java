@@ -103,8 +103,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void updateHistory()
     {
-        for(int i = 0; dtm2.getRowCount() != 0;)
-            dtm2.removeRow(i);
+        dtm2.setRowCount(0);
         DB_Transaction tDb = new DB_Transaction();
         transactions = tDb.processData(null, null);
         ArrayList<String> idLists = tDb.getIdList();
@@ -1391,7 +1390,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
-        
+        updateHistory();
     }//GEN-LAST:event_formWindowGainedFocus
 
     private void button_cancelTransactionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_cancelTransactionActionPerformed
@@ -1513,7 +1512,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void viewStocks(){
-        ViewTransferStockDialog viewTransfer = new ViewTransferStockDialog(this, true);
+        ViewTransferStockDialog viewTransfer = new ViewTransferStockDialog(this, true, this);
         int x = (getWidth() - viewTransfer.getWidth()) / 2;
         int y = (getHeight() - viewTransfer.getHeight()) / 2;
         viewTransfer.setLocation(x,y);

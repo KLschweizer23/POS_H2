@@ -8,7 +8,7 @@ import myUtilities.DatabaseFunctions;
 
 public class DB_Item {
     
-    private final String table = "table_item";
+    public final String table = "table_item";
     
     private final String ID = "ID";
     private final String NAME = "ITEM_NAME";

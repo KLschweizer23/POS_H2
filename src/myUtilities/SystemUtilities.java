@@ -63,22 +63,49 @@ public class SystemUtilities
     {            
         MessageHandler mh = new MessageHandler();
         
-        String quantity;
+        String string;
         boolean pass;
         do
         {
-            quantity = mh.input(message);
-            if(quantity == null)
+            string = mh.input(message);
+            if(string == null)
                 pass = true;
             else
             {
-                pass = !quantity.isBlank();
+                pass = !string.isBlank();
                 if(pass)
-                    return quantity;
+                    return string;
             }
         }while(!pass);
         
-        return quantity;
+        return string;
+    }
+    
+    /**
+     * 
+     * @param message String to display.
+     * @return Returns the inputted Password of User.
+     */
+    public String inputPasswordUser(String message)
+    {            
+        MessageHandler mh = new MessageHandler();
+        
+        String password;
+        boolean pass;
+        do
+        {
+            password = mh.password(message);
+            if(password == null)
+                pass = true;
+            else
+            {
+                pass = !password.isBlank();
+                if(pass)
+                    return password;
+            }
+        }while(!pass);
+        
+        return password;
     }
     
     //----------------------------STRING FUNCTIONS-------------------------\\

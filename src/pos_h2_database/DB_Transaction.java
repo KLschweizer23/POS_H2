@@ -2,6 +2,7 @@ package pos_h2_database;
 
 import extraClasses.ChartData;
 import extraClasses.InventoryObject;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -88,7 +89,49 @@ public class DB_Transaction {
         DatabaseFunctions df = new DatabaseFunctions();
         df.insertData(table, columnToKeys(false), dataToKeys(transaction, true));
     }
-    
+    public void removeItem(Transaction transaction, Item item){
+        if(transaction == null || item == null){
+            new MessageHandler().warning("Can't remove item!");
+        }else{
+            DatabaseFunctions df = new DatabaseFunctions();
+            double newTotal = Double.parseDouble(transaction.getTotalAmount()) - (Double.parseDouble(item.getPrice()) * Double.parseDouble(item.getQuantity()));
+            String query1 = "DELETE FROM " + table + " WHERE " + T_ID + " = " + transaction.getId() + " AND " + I_ID + " = " + item.getId();
+            String query2 = "UPDATE " + table + " SET " + TOTAL_AMOUNT + " = " + newTotal + " WHERE " + T_ID + " = " + transaction.getId();
+            boolean success = true;
+            try{
+                df.executeQuery(query1);
+                df.executeQuery(query2);
+            }catch(SQLException sql){
+                new MessageHandler().error("<html>There was an error executing this query: " + query1 + "<br>" + sql.getMessage() + "</html>", false);
+                success = false;
+            }
+            if(success){
+                new MessageHandler().message("The item has void successfuly!");
+            }
+        }
+    }
+    public void adjustItem(Transaction transaction, Item item, double newQuantity){
+        if(transaction == null || item == null){
+            new MessageHandler().warning("Can't remove item!");
+        }else{
+            DatabaseFunctions df = new DatabaseFunctions();
+            double newTotal = Double.parseDouble(transaction.getTotalAmount()) - (Double.parseDouble(item.getPrice()) * (Double.parseDouble(item.getQuantity()) - newQuantity));
+            String query1 = "UPDATE " + table + " SET " + I_QUANTITY + " = " + newQuantity + " WHERE " + T_ID + " = " + transaction.getId() + " AND " + I_ID + " = " + item.getId();
+            String query2 = "UPDATE " + table + " SET " + TOTAL_AMOUNT + " = " + newTotal + " WHERE " + T_ID + " = " + transaction.getId();
+            boolean success = true;
+            try{
+                df.executeQuery(query1);
+                df.executeQuery(query2);
+            }catch(SQLException sql){
+                new MessageHandler().error("<html>There was an error executing this query: " + query1 + "<br>" + sql.getMessage() + "</html>", false);
+                new MessageHandler().error("<html>There was an error executing this query: " + query2 + "<br>" + sql.getMessage() + "</html>", false);
+                success = false;
+            }
+            if(success){
+                new MessageHandler().message("The item has adjusted successfuly!");
+            }
+        }
+    }
     public String getAvailableTID()
     {
         DatabaseFunctions df = new DatabaseFunctions();

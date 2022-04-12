@@ -14,6 +14,8 @@ public class DB_Login {
     private final String TIME_IN = "TIME_IN";
     private final String TIME_OUT = "TIME_OUT";
     
+    private final String adminPass = "admin";
+    
     private HashMap<String, Log> logs = new HashMap<>();
     private ArrayList<String> idList = new ArrayList<>();
     
@@ -59,6 +61,18 @@ public class DB_Login {
             idList.add(id);
         }
         return logs;
+    }
+    
+    public boolean checkPassword(String pass){
+        if(pass != null){
+            if(pass.length() == adminPass.length()){
+                for(int i = 0; i < pass.length(); i++)
+                    if(pass.charAt(i) != adminPass.charAt(i))
+                        return false;
+            }else return false;
+
+            return true;
+        }else return false;
     }
     
     public void insertData(Log log)

@@ -1,6 +1,7 @@
 package myUtilities;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 
 public class MessageHandler
 {
@@ -27,5 +28,12 @@ public class MessageHandler
     {
         String in = JOptionPane.showInputDialog(null, message, "");
         return in;
+    }
+    public String password(String message)
+    {
+        JPasswordField passField = new JPasswordField(20);
+        int choice = JOptionPane.showConfirmDialog(null, passField, "Input Password", JOptionPane.OK_CANCEL_OPTION);
+        if(choice == JOptionPane.CANCEL_OPTION) return null;
+        return new String(passField.getPassword());
     }
 }

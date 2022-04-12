@@ -138,15 +138,15 @@
                       <Component id="label_salesClerk1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="label_salesClerk2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="label_totalAmount" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="label_discount" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="label_salesClerk4" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="label_salesClerk3" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="label_payment" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="label_discount" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="9" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -289,7 +289,7 @@
               <Font name="Tahoma" size="14" style="1"/>
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+              <Color blue="cc" green="cc" red="cc" type="rgb"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="text" type="java.lang.String" value="00"/>

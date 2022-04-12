@@ -12,6 +12,8 @@ public class LoginFormDialog extends javax.swing.JDialog {
     MessageHandler mh = new MessageHandler();
     MainFrame main;
     
+    private final String adminUser = "admin";
+    
     public LoginFormDialog(MainFrame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -229,12 +231,13 @@ public class LoginFormDialog extends javax.swing.JDialog {
     {
         DB_Clerk clerkDb = new DB_Clerk();
         Clerk clerk = clerkDb.checkPassword(field_username.getText(), field_password.getPassword());
+        DB_Login logDb = new DB_Login();
         
         String pass = "";
         
         for(char x : field_password.getPassword())
             pass += x;
-        if (field_username.getText().equals("admin") && pass.equals("admin"))
+        if (field_username.getText().equals(adminUser) && logDb.checkPassword(pass))
         {
             clerk = new Clerk();
             clerk.setId("admin");

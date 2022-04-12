@@ -5,9 +5,15 @@
  */
 package pos_h2;
 
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
+import myUtilities.MessageHandler;
 import pos_h2_database.DB_TransferStocks;
 import pos_h2_database.StockTransfer;
 
@@ -18,14 +24,23 @@ import pos_h2_database.StockTransfer;
 public class ViewTransferStockDialog extends javax.swing.JDialog {
 
     private DefaultTableModel dtm;
+    private MainFrame mf;
+    private HashMap<String, StockTransfer> stockTransfers;
+    private Frame parent;
     
-    public ViewTransferStockDialog(java.awt.Frame parent, boolean modal) {
+    public ViewTransferStockDialog(java.awt.Frame parent, boolean modal, MainFrame mainFrame) {
         super(parent, modal);
+        
+        mf = mainFrame;
+        this.parent = parent;
+        
         initComponents();
         
         createColumns();
         prepareTable();
+        setupTable();
     }
+    
     private void createColumns(){
         dtm = new DefaultTableModel(0,0){
             @Override
@@ -44,7 +59,7 @@ public class ViewTransferStockDialog extends javax.swing.JDialog {
         
         dtm.setRowCount(0);
         
-        HashMap<String, StockTransfer> stockTransfers = tsDb.processData("", 0);
+        stockTransfers = tsDb.processData("", 0);
         ArrayList<String> idLists = tsDb.getIdList();
         
         for(int i = idLists.size() - 1; i >= 0; i--){
@@ -63,6 +78,62 @@ public class ViewTransferStockDialog extends javax.swing.JDialog {
         table_transfer.setRowHeight(30);
         label_transferCount.setText(stockTransfers.size() + " transfer/s");
     }
+    
+    private void setupTable(){
+        table_transfer.addMouseListener(new MouseListener() {
+            private boolean onTable = false;
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(onTable)
+                {
+                    Point p = e.getPoint();
+                    int y = p.y / 30;
+                    if(y < dtm.getRowCount())
+                        displaySelectedId();
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                onTable = true;
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                onTable = false;
+            }
+        });
+        
+        table_transfer.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                int y = p.y / 30;
+                if(y < dtm.getRowCount())
+                    table_transfer.setRowSelectionInterval(0, y);
+            }
+        });
+    }
+    
+    private void displaySelectedId(){
+        StockTransfer st = stockTransfers.get(dtm.getValueAt(table_transfer.getSelectedRow(), 0));
+        ViewSingleTransferStock viewSingle = new ViewSingleTransferStock(parent, true, st);
+        int x = (mf.getWidth() - viewSingle.getWidth()) / 2;
+        int y = (mf.getHeight() - viewSingle.getHeight()) / 2;
+        viewSingle.setLocation(x,y);
+        viewSingle.setVisible(true);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -78,6 +149,7 @@ public class ViewTransferStockDialog extends javax.swing.JDialog {
         label_transferCount = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         jScrollPane1.setFocusable(false);
 

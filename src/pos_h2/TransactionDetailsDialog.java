@@ -1,12 +1,20 @@
 package pos_h2;
 
+import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
+import myUtilities.MessageHandler;
+import myUtilities.SystemUtilities;
 import pos_h2_database.DB_Discount;
+import pos_h2_database.DB_Login;
+import pos_h2_database.DB_Transaction;
 import pos_h2_database.Discount;
 import pos_h2_database.Item;
 import pos_h2_database.Transaction;
@@ -26,6 +34,7 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
         createColumns();
         prepareDetails();
         prepareTable();
+        setupTable();
         commands();
     }
     
@@ -53,6 +62,84 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
         label_totalAmount.setText((char)8369 + " " + totalAmount);
         label_payment.setText((char)8369 + " " + payment);
         label_discount.setText(discount);
+    }
+    
+    private void setupTable(){
+        table_items.addMouseListener(new MouseListener() {
+            private boolean onTable = false;
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(onTable)
+                {
+                    Point p = e.getPoint();
+                    int y = p.y / 30;
+                    if(y < dtm.getRowCount())
+                        makeVoid();
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                onTable = true;
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                onTable = false;
+            }
+        });
+        
+        table_items.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                int y = p.y / 30;
+                if(y < dtm.getRowCount())
+                    table_items.setRowSelectionInterval(0, y);
+            }
+        });
+    }
+    
+    private void makeVoid(){
+        SystemUtilities su = new SystemUtilities();
+        DB_Login loginDb = new DB_Login();
+        String authorizationPassword = su.inputPasswordUser("Enter administrator's password to adjust/void item!");
+        if(authorizationPassword != null){
+            if(loginDb.checkPassword(authorizationPassword)){
+                Item item = currentTransaction.getItem().get(table_items.getSelectedRow());
+                String newQuantity = su.inputNumberUser(
+                        "<html>"
+                                + "Enter new quantity for this item!" + "<br>"
+                                + "<i>Note: Enter 0 to void the item.</i>" + "<br>"
+                                + "Old Quantity: <b>" + item.getQuantity() + "</b>" + "<br>" + 
+                        "</html>"
+                );
+                if(newQuantity != null){
+                    double quantity = Double.parseDouble(newQuantity);
+                    if(quantity <= Double.parseDouble(item.getQuantity())){
+                        if(quantity == 0){
+                            DB_Transaction transactionDb = new DB_Transaction();
+                            transactionDb.removeItem(currentTransaction, item);
+                        }else{
+                            DB_Transaction transactionDb = new DB_Transaction();
+                            transactionDb.adjustItem(currentTransaction, item, quantity);
+                        }
+                    }else{
+                        new MessageHandler().warning("<html>New Quantity should be lesser than the actual quantity!<br>Make a new transaction instead</html>");
+                    }
+                }
+            }else new MessageHandler().warning("Wrong password!");
+        }
     }
     
     private String discount(String clerkWithID){
@@ -210,7 +297,7 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
 
         label_id.setBackground(new java.awt.Color(255, 255, 255));
         label_id.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        label_id.setForeground(new java.awt.Color(255, 255, 255));
+        label_id.setForeground(new java.awt.Color(204, 204, 204));
         label_id.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         label_id.setText("00");
         label_id.setFocusable(false);
@@ -265,14 +352,14 @@ public class TransactionDetailsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(label_salesClerk1)
                     .addComponent(label_salesClerk2)
-                    .addComponent(label_totalAmount))
+                    .addComponent(label_totalAmount)
+                    .addComponent(label_discount))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(label_salesClerk4)
                     .addComponent(label_salesClerk3)
-                    .addComponent(label_payment)
-                    .addComponent(label_discount))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(label_payment))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

@@ -51,6 +51,30 @@ public class DB_TransferStocks {
         return stockTransfers;
     }
     
+    public HashMap<String, Item> getItemsByTransferId(String id){
+        DatabaseFunctions dbf = new DatabaseFunctions();
+        String[] keys = {"ID", "Name", "Brand", "Article", "Price", "Quantity"};
+        
+        HashMap<String, Item> items = new HashMap<>();
+        
+        String query = "SELECT t.I_ID as 'ID', i.ITEM_NAME as 'Name', i.brand as 'Brand', i.article as 'Article', i.PRICE as 'Price', t.I_QUANTITY as 'Quantity' FROM " + table + " t, " + new DB_Item().table + " i WHERE t.I_ID = i.ID";
+        HashMap<String, ArrayList> map = dbf.customReturnQuery(query, keys);
+        for(int i = 0; i < (map.get("ID") == null ? 0 : map.get("ID").size()); i++){
+            Item item = new Item();
+            String itemID = map.get("ID").get(i).toString();
+            
+            item.setId(itemID);
+            item.setName(map.get("Name").get(i).toString());
+            item.setBrand(map.get("Brand").get(i).toString());
+            item.setArticle(map.get("Article").get(i).toString());
+            item.setPrice(map.get("Price").get(i).toString());
+            item.setQuantity(map.get("Quantity").get(i).toString());
+            
+            items.put(itemID, item);
+        }
+        return items;
+    }
+    
     public void insertData(StockTransfer stockTransfer){
         DatabaseFunctions df = new DatabaseFunctions();
         df.insertData(table, columnToKeys(false), dataToKeys(stockTransfer, true));
