@@ -528,7 +528,7 @@ public class SalesDialog extends javax.swing.JDialog {
                         String reportPath = System.getProperty("user.dir") + "\\DailyReport.jrxml";
 
                         Map<String, Object> parameters = new HashMap<>();
-                        parameters.put("logo", getClass().getResource("/Images/logo_h2.png"));//needs to change for flexibility
+                        parameters.put("logo", getClass().getResource("/Images/logo.png"));//needs to change for flexibility
 
                         String year = combobox_fromYear.getSelectedItem().toString();
                         int initialMonth = combobox_fromMonth.getSelectedIndex() + 1;
