@@ -16,7 +16,7 @@ import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import myUtilities.MessageHandler;
-import myUtilities.SystemUtilities;
+import myUtilities.system_utilities.SystemUtilities;
 import pos_h2_database.DB_Discount;
 import pos_h2_database.Discount;
 

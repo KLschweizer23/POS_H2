@@ -1,4 +1,4 @@
-package myUtilities;
+package myUtilities.system_utilities;
 
 import java.awt.Component;
 import java.awt.Image;
@@ -17,6 +17,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import myUtilities.MessageHandler;
+import myUtilities.MyConnection;
 
 /**
  * Just to make some functions centralized and easy to call.

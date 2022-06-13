@@ -21,7 +21,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
-import myUtilities.SystemUtilities;
+import myUtilities.system_utilities.SystemUtilities;
 import pos_h2_database.DB_Item;
 import pos_h2_database.DB_Store;
 import pos_h2_database.DB_TransferStocks;

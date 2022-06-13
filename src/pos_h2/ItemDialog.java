@@ -16,7 +16,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
-import myUtilities.SystemUtilities;
+import myUtilities.system_utilities.SystemUtilities;
 import pos_h2_database.*;
 
 public class ItemDialog extends javax.swing.JDialog {

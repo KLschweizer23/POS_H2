@@ -31,7 +31,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import myUtilities.MessageHandler;
-import myUtilities.SystemUtilities;
+import myUtilities.system_utilities.SystemUtilities;
 import pos_h2_database.Clerk;
 import pos_h2_database.DB_Discount;
 import pos_h2_database.DB_Item;

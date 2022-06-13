@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import myUtilities.MessageHandler;
-import myUtilities.SystemUtilities;
+import myUtilities.system_utilities.SystemUtilities;
 import pos_h2_database.*;
 
 public class LoginFormDialog extends javax.swing.JDialog {
